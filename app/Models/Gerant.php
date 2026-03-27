@@ -23,4 +23,10 @@ class Gerant extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    //Relation avec Entreprise
+    public function entreprises()
+    {
+        return $this->hasMany(Entreprise::class);
+    }
 }

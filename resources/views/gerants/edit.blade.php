@@ -4,7 +4,7 @@
         <h2 class="text-2xl font-bold mb-6">Profil Gérant</h2>
 
         @if(session('success'))
-            <div class="bg-green-500 text-white p-3 mb-4 rounded">
+            <div class="bg-green-500 p-3 mb-4 rounded">
                 {{ session('success') }}
             </div>
         @endif

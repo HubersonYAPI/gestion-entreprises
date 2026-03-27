@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\EntrepriseController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\GerantController;
 use Illuminate\Support\Facades\Route;
@@ -19,6 +20,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/profile-gerant', [GerantController::class, 'edit'])->name('gerant.edit');
     Route::post('/profile-gerant', [GerantController::class, 'update'])->name('gerant.update');
+
+    Route::resource('entreprises', EntrepriseController::class);
 });
 
 require __DIR__.'/auth.php';
