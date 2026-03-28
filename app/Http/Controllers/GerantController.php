@@ -9,6 +9,17 @@ use Illuminate\Support\Facades\Storage;
 
 class GerantController extends Controller
 {
+    public function show()
+    {
+        $gerant = Auth::user()->gerant;
+
+        if (!$gerant) {
+            return redirect()->route('gerant.edit')->with('error', "Aucun Profil gérant trouvé.");
+        }
+
+        return view('gerants.show', compact('gerant'));
+    }
+
     public function edit()
     {
         $gerant = Auth::user()->gerant;

@@ -10,10 +10,26 @@
                     </a>
                 </div>
 
-                <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+
+                    <!-- Dashboard -->
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
+                        Dashboard
+                    </x-nav-link>
+                    
+                    <!-- Gerant -->
+                    <x-nav-link :href="route('gerant.show')" :active="request()->routeIs('gerant.*')">
+                        Infos Gerant
+                    </x-nav-link>
+
+                    <!-- Entreprise -->
+                    <x-nav-link :href="route('entreprises.index')" :active="request()->routeIs('entreprises.*')">
+                        Infos Entreprise
+                    </x-nav-link>
+
+                    <!-- Déclarations -->
+                    <x-nav-link :href="route('declarations.index')" :active="request()->routeIs('declarations.*')">
+                        Mes Déclarations
                     </x-nav-link>
                 </div>
             </div>

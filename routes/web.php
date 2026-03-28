@@ -6,6 +6,7 @@ use App\Http\Controllers\GerantController;
 use App\Http\Controllers\DeclarationController;
 use App\Http\Controllers\DocumentController;
 use App\Models\Declaration;
+use App\Models\Gerant;
 use Dom\Document;
 use Illuminate\Support\Facades\Route;
 
@@ -22,6 +23,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    Route::get('/gerant', [GerantController::class,'show'])->name('gerant.show');
     Route::get('/profile-gerant', [GerantController::class, 'edit'])->name('gerant.edit');
     Route::post('/profile-gerant', [GerantController::class, 'update'])->name('gerant.update');
 

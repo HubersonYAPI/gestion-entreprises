@@ -40,16 +40,27 @@
 
                 @if($gerant && $gerant->piece_identite)
                     <p class="mt-2">
-                        <a href="{{ asset('storage/'.$gerant->piece_identite) }}" target="_blank" class="text-blue-500">
-                            Voir le fichier
+                        <a href="{{ asset('storage/'.$gerant->piece_identite) }}" 
+                            target="_blank" class="text-blue-500 hover:underline flex items-center gap-1">
+                            <x-heroicon-o-eye class="w-5 h-5"/>
+                            <span>Voir le fichier</span>
                         </a>
                     </p>
                 @endif
             </div>
 
-            <button class="bg-blue-600 px-4 py-2 rounded">
-                Enregistrer
-            </button>
+            <div class="mt-6 flex gap-3">
+            
+                <!-- 🔙 Bouton retour -->
+                <a href="{{ route('gerant.show') }}" 
+                    class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">
+                    Retour
+                </a>
+
+                <button class="bg-blue-600 px-4 py-2 rounded">
+                    Enregistrer
+                </button>
+            </div>
         </form>
     </div>
 </x-app-layout>

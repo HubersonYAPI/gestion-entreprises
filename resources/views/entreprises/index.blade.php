@@ -2,7 +2,7 @@
     <div class="max-w-5xl mx-auto mt-10 bg-white p-6 rounded shadow">
 
         <div class="flex justify-between mb-6">
-            <h2 class="text-2xl font-bold">Mes entreprises>Mes Entreprises</h2>
+            <h2 class="text-2xl font-bold">Mes Entreprises</h2>
             <a href="{{ route('entreprises.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded">
                 + Ajouter
             </a>
@@ -29,14 +29,20 @@
                         <td class="p-2"> {{$entreprise->nom}} </td>
                         <td class="p-2"> {{$entreprise->rccm}} </td>
                         <td class="p-2"> {{$entreprise->adresse}} </td>
-                        <td class="p-2 flex gap-2">
-                            <a href="{{ route('entreprises.edit', $entreprise) }}" class="text-blue-500">Modifier</a>
+                        <td class="p-2 flex gap-2">                            
+                            <!-- Modifier -->
+                            <a href="{{ route('entreprises.edit', $entreprise) }}" title="Modifier" class="text-yellow-500 hover:text-yellow-700">
+                                <x-heroicon-o-pencil-square class="w-5 h-5"/>
+                            </a>
 
                             <form action="{{route('entreprises.destroy', $entreprise)}}" method="post">
                                 @csrf
                                 @method('DELETE')
 
-                                <button class="text-red-500">Supprimer</button>
+                                {{-- <button class="text-red-500">Supprimer</button> --}}
+                                <button title="Supprimer" class="text-red-500 hover:text-red-700">
+                                    <x-heroicon-o-trash class="w-5 h-5"/>
+                                </button>
                             </form>
                         </td>
                     </tr>
