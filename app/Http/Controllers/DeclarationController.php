@@ -89,6 +89,7 @@ class DeclarationController extends Controller
     {
         $this->authorizeAccess($declaration);
         $entreprises = Auth::user()->gerant->entreprises;
+        $declaration->load('documents');
 
         return view('declarations.show', compact('declaration', 'entreprises'));
     }
@@ -157,7 +158,7 @@ class DeclarationController extends Controller
     }
 
     /**
-     * 🔐 Sécurité centralisée
+     * Sécurité centralisée
      */
     private function authorizeAccess($declaration)
     {

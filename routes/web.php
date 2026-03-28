@@ -4,7 +4,9 @@ use App\Http\Controllers\EntrepriseController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\GerantController;
 use App\Http\Controllers\DeclarationController;
+use App\Http\Controllers\DocumentController;
 use App\Models\Declaration;
+use Dom\Document;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -26,8 +28,12 @@ Route::middleware('auth')->group(function () {
     Route::resource('entreprises', EntrepriseController::class);
     Route::resource('declarations', DeclarationController::class);
 
-    //soumission
+    //soumission declaration
     Route::post('/declarations/{declaration}/submit', [DeclarationController::class, 'submit'])->name('declarations.submit');
+
+    Route::get('/declarations/{declaration}/documents', [DocumentController::class, 'index'])->name('documents.index');
+    Route::post('/declarations/{declaration}/documents', [DocumentController::class, 'store'])->name('documents.store');
+    Route::delete('/documents/{document}', [DocumentController::class, 'destroy'])->name('documents.destroy');
 });
 
 require __DIR__.'/auth.php';

@@ -45,6 +45,42 @@
             <p><strong>Phase :</strong> {{ $declaration->phase_label }}</p>
         </div>
 
+        <!-- 📄 Documents -->
+        <div class="bg-white shadow rounded p-4 mt-6">
+            <h3 class="font-bold text-lg mb-4">Documents</h3>
+
+            @if($declaration->documents->isEmpty())
+                <p class="text-gray-500">Aucun document ajouté.</p>
+            @else
+                <table class="w-full border">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="p-2 text-left">Type</th>
+                            <th class="p-2 text-left">Statut</th>
+                            <th class="p-2 text-left">Fichier</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($declaration->documents as $doc)
+                            <tr class="border-t">
+                                <td class="p-2">{{ $doc->type }}</td>
+                                <td class="p-2">{{ $doc->statut }}</td>
+                                <td class="p-2">
+                                    <a href="{{ asset('storage/'.$doc->file_path) }}" 
+                                    target="_blank"
+                                    class="text-blue-500 hover:underline flex items-center gap-1">
+                                        <x-heroicon-o-eye class="w-5 h-5"/>
+                                        <span>Voir fichier</span>
+                                    </a>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @endif
+
+        </div>
+
         <div class="mt-6 flex gap-3">
 
             <!-- 🔙 Bouton retour -->

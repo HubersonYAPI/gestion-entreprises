@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Document;
 use Illuminate\Database\Eloquent\Model;
 
 class Declaration extends Model
@@ -40,5 +41,10 @@ class Declaration extends Model
     public function entreprise()
     {
         return $this->belongsTo(Entreprise::class);
+    }
+
+    public function documents()
+    {
+        return $this->hasMany(Document::class);
     }
 }

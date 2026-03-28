@@ -17,11 +17,11 @@
     <table class="w-full border">
         <thead>
             <tr class="bg-gray-100">
-                <th class="p-2">Référence</th>
-                <th class="p-2">Entreprise</th>
-                <th class="p-2">Statut</th>
-                <th class="p-2">Phase</th>
-                <th class="p-2">Actions</th>
+                <th class="p-2 text-left">Référence</th>
+                <th class="p-2 text-left">Entreprise</th>
+                <th class="p-2 text-left">Statut</th>
+                <th class="p-2 text-left">Phase</th>
+                <th class="p-2 text-left">Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -33,22 +33,40 @@
                 <td class="p-2">{{ $declaration->phase_label  }}</td>
                 <td class="p-2 flex gap-2">
                     
-                    <a href="{{ route('declarations.show', $declaration) }}" class="text-blue-500">Voir</a>
+                    <!-- 👁 Voir -->
+                    <a href="{{ route('declarations.show', $declaration) }}" title="Voir" class="text-blue-600 hover:text-blue-800">
+                        <x-heroicon-o-eye class="w-5 h-5"/>
+                    </a>
                     
+                    <!-- 📄 Documents -->
+                    <a href="{{ route('documents.index', $declaration) }}" title="Documents" class="text-purple-600 hover:text-purple-800">
+                        <x-heroicon-o-document-text class="w-5 h-5"/>
+                    </a>
 
                     @if($declaration->statut === 'brouillon')
-                        <a href="{{ route('declarations.edit', $declaration) }}" class="text-yellow-500">Modifier</a>
 
+                        <!-- Modifier -->
+                        <a href="{{ route('declarations.edit', $declaration) }}" title="Modifier" class="text-yellow-500 hover:text-yellow-700">
+                            <x-heroicon-o-pencil-square class="w-5 h-5"/>
+                        </a>
+
+                        <!-- Soumettre -->
                         <form method="POST" action="{{ route('declarations.submit', $declaration) }}">
                             @csrf                            
-                            <button class="text-green-600">Soumettre</button>
+                            <button type="submit" class="text-green-500 hover:text-green-700 flex items-center gap-1">
+                                <x-heroicon-o-check class="w-5 h-5"/>
+                                <span>Soumettre</span>
+                            </button>
                         </form>
 
+                        <!-- Supprimer -->
                         <form method="POST" action="{{ route('declarations.destroy', $declaration) }}">
-                        @csrf
-                        @method('DELETE')
-                        <button class="text-red-500">Supprimer</button>
-                    </form>
+                            @csrf
+                            @method('DELETE')
+                            <button title="Supprimer" class="text-red-500 hover:text-red-700">
+                                <x-heroicon-o-trash class="w-5 h-5"/>
+                            </button>
+                        </form>
                     @endif
 
                 </td>
