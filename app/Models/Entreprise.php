@@ -19,4 +19,10 @@ class Entreprise extends Model
     {
         return $this->belongsTo(Gerant::class);
     }
+
+    //Relation avec Declaration
+    public function declarations()
+    {
+        return $this->hasMany(Declaration::class);
+    }
 }

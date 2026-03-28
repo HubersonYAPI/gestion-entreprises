@@ -3,6 +3,8 @@
 use App\Http\Controllers\EntrepriseController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\GerantController;
+use App\Http\Controllers\DeclarationController;
+use App\Models\Declaration;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -22,6 +24,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile-gerant', [GerantController::class, 'update'])->name('gerant.update');
 
     Route::resource('entreprises', EntrepriseController::class);
+    Route::resource('declarations', DeclarationController::class);
+
+    //soumission
+    Route::post('/declarations/{declaration}/submit', [DeclarationController::class, 'submit'])->name('declarations.submit');
 });
 
 require __DIR__.'/auth.php';
