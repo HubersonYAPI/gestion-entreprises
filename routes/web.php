@@ -5,9 +5,10 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\GerantController;
 use App\Http\Controllers\DeclarationController;
 use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\AgentController;
 use App\Models\Declaration;
 use App\Models\Gerant;
-use Dom\Document;
+use App\Models\Document;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -36,6 +37,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/declarations/{declaration}/documents', [DocumentController::class, 'index'])->name('documents.index');
     Route::post('/declarations/{declaration}/documents', [DocumentController::class, 'store'])->name('documents.store');
     Route::delete('/documents/{document}', [DocumentController::class, 'destroy'])->name('documents.destroy');
+});
+
+Route::prefix('agent')->middleware(['auth', 'role:AGENT'])->group(function(){
+    Route::get('/dashboard', [AgentController::class, 'dashboard'])->name('agent.dashboard');
 });
 
 require __DIR__.'/auth.php';
