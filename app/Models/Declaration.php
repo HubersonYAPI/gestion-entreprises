@@ -33,7 +33,6 @@ class Declaration extends Model
             3 => 'Paiement',
             4 => 'En_traitement', 
             5 => 'Terminé',
-            6 => 'Rejeté',
             default => 'Inconnu',
         };
     }

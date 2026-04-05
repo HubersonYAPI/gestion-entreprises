@@ -10,12 +10,44 @@ use function Symfony\Component\Clock\now;
 
 class AgentController extends Controller
 {
-    public function dashboard()
+    public function dashboard(Request $request)
     {
-        $declarations = Declaration::where('phase', '>', 1)
-        ->latest()->get();
+        $query = Declaration::where('phase', '>', 1);
 
-        return view('agent.dashboard', compact('declarations'));
+        // Détection du filtre via la route
+        if ($request->routeIs('agent.declarations.soumis')) {
+            $query->where('statut', 'soumis');
+        }
+
+        if ($request->routeIs('agent.declarations.non-paye')) {
+            $query->where('statut', 'non_paye');
+        }
+
+        if ($request->routeIs('agent.declarations.en-traitement')) {
+            $query->where('statut', 'en_traitement');
+        }
+
+        if ($request->routeIs('agent.declarations.valider')) {
+            $query->where('statut', 'validé');
+        }
+
+        if ($request->routeIs('agent.declarations.rejeter')) {
+            $query->where('statut', 'rejeté');
+        }
+
+        $declarations = $query->latest()->paginate(10);
+
+        // Statistiques pour le dashboard
+        $stats = [
+            'total' => Declaration::where('phase', '>', 1)->count(),
+            'soumis' => Declaration::where('statut', 'soumis')->count(),
+            'non_paye' => Declaration::where('statut', 'non_paye')->count(),
+            'en_traitement' => Declaration::where('statut', 'en_traitement')->count(),
+            'valide' => Declaration::where('statut', 'validé')->count(),
+            'rejete' => Declaration::where('statut', 'rejeté')->count(),
+        ];
+
+        return view('agent.dashboard', compact('declarations',  'stats'));
     }
 
     public function show(Declaration $declaration)
@@ -89,8 +121,8 @@ class AgentController extends Controller
 
         
         $declaration->update([
-            'statut' => 'incomplet',
-            'phase' => 6,
+            'statut' => 'rejeté',
+            'phase' => 5,
             //Ajouter un champ commentaire dans la table Declaration
             //'commentaire' => $request->commentaire,
         ]);

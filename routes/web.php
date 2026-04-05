@@ -39,28 +39,52 @@ Route::middleware('auth')->group(function () {
     Route::delete('/documents/{document}', [DocumentController::class, 'destroy'])->name('documents.destroy');
 });
 
-Route::prefix('agent')->middleware(['auth', 'role:AGENT|CONTROLEUR|SUPER_ADMIN'])->group(function(){
-    Route::get('/dashboard', [AgentController::class, 'dashboard'])->name('agent.dashboard');
-
-    // Documents
-    Route::post('/documents/{document}/valider', [AgentController::class, 'validerDocument'])
-        ->name('documents.valider');
-
-    Route::post('/documents/{document}/rejeter', [AgentController::class, 'rejeterDocument'])
-        ->name('documents.rejeter');
-
-    // Déclaration
-    Route::get('/declarations/{declaration}', [AgentController::class, 'show'])
-        ->name('agent.declarations.show');
-
-    Route::get('/declarations/{declaration}/documents', [AgentController::class, 'documents'])
-        ->name('agent.declaration.documents');
-
-    Route::post('declarations/{declaration}/valider', [AgentController::class, 'valider'])
-        ->name('agent.valider');
-
-    Route::post('declarations/{declaration}/rejeter', [AgentController::class, 'rejeter'])
-        ->name('agent.rejeter');
+/**
+ * Routes Agent / Admin — UN SEUL groupe
+ */
+Route::prefix('agent')
+    ->name('agent.')
+    ->middleware(['auth', 'role:AGENT|CONTROLEUR|SUPER_ADMIN'])
+    ->group(function () {
+ 
+    // ── Dashboard ──────────────────────────────────────────────
+    Route::get('/dashboard', [AgentController::class, 'dashboard'])->name('dashboard');
+ 
+    // ── Documents ──────────────────────────────────────────────
+    Route::post('/documents/{document}/valider', [AgentController::class, 'validerDocument'])->name('documents.valider');
+    Route::post('/documents/{document}/rejeter', [AgentController::class, 'rejeterDocument'])->name('documents.rejeter');
+ 
+    // ── Déclarations — statuts (routes FIXES en premier, avant {declaration}) ──
+    Route::get('/declarations/soumis',        [AgentController::class, 'dashboard'])->name('declarations.soumis');
+    Route::get('/declarations/non-paye',       [AgentController::class, 'dashboard'])->name('declarations.non-paye');
+    Route::get('/declarations/en-traitement',  [AgentController::class, 'dashboard'])->name('declarations.en-traitement');
+    Route::get('/declarations/valider-liste',  [AgentController::class, 'dashboard'])->name('declarations.valider');
+    Route::get('/declarations/rejeter-liste',  [AgentController::class, 'dashboard'])->name('declarations.rejeter');
+ 
+    // ── Déclarations — détail (route DYNAMIQUE après les fixes) ──
+    Route::get('/declarations/{declaration}',           [AgentController::class, 'show'])->name('declarations.show');
+    Route::get('/declarations/{declaration}/documents', [AgentController::class, 'documents'])->name('declaration.documents');
+    Route::post('/declarations/{declaration}/valider',  [AgentController::class, 'valider'])->name('valider');
+    Route::post('/declarations/{declaration}/rejeter',  [AgentController::class, 'rejeter'])->name('rejeter');
+ 
+    // ── Entreprises ────────────────────────────────────────────
+    Route::get('/entreprises', [AgentController::class, 'dashboard'])->name('entreprises.index');
+    Route::get('/gerants',     [AgentController::class, 'dashboard'])->name('gerants.index');
+ 
+    // ── Attestations ───────────────────────────────────────────
+    Route::get('/attestations',          [AgentController::class, 'dashboard'])->name('attestations.index');
+    Route::get('/attestations/en-cours', [AgentController::class, 'dashboard'])->name('attestations.en-cours');
+ 
+    // ── Analyses ───────────────────────────────────────────────
+    Route::get('/analyses/statistiques', [AgentController::class, 'dashboard'])->name('analyses.statistiques');
+    Route::get('/analyses/rapports',     [AgentController::class, 'dashboard'])->name('analyses.rapports');
+ 
+    // ── Administration ─────────────────────────────────────────
+    Route::get('/admin/utilisateurs', [AgentController::class, 'dashboard'])->name('admin.utilisateurs');
+    Route::get('/admin/roles',        [AgentController::class, 'dashboard'])->name('admin.roles');
+    Route::get('/admin/logs',         [AgentController::class, 'dashboard'])->name('admin.logs');
 });
+ 
+
 
 require __DIR__.'/auth.php';
