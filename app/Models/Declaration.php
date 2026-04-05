@@ -30,9 +30,10 @@ class Declaration extends Model
         return match($this->phase){
             1 => 'Création',
             2 => 'Soumission',
-            3 => 'Validation',
-            4 => 'Paiement', 
+            3 => 'Paiement',
+            4 => 'En_traitement', 
             5 => 'Terminé',
+            6 => 'Rejeté',
             default => 'Inconnu',
         };
     }

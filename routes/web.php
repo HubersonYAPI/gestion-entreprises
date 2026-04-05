@@ -39,8 +39,28 @@ Route::middleware('auth')->group(function () {
     Route::delete('/documents/{document}', [DocumentController::class, 'destroy'])->name('documents.destroy');
 });
 
-Route::prefix('agent')->middleware(['auth', 'role:AGENT'])->group(function(){
+Route::prefix('agent')->middleware(['auth', 'role:AGENT|CONTROLEUR|SUPER_ADMIN'])->group(function(){
     Route::get('/dashboard', [AgentController::class, 'dashboard'])->name('agent.dashboard');
+
+    // Documents
+    Route::post('/documents/{document}/valider', [AgentController::class, 'validerDocument'])
+        ->name('documents.valider');
+
+    Route::post('/documents/{document}/rejeter', [AgentController::class, 'rejeterDocument'])
+        ->name('documents.rejeter');
+
+    // Déclaration
+    Route::get('/declarations/{declaration}', [AgentController::class, 'show'])
+        ->name('agent.declarations.show');
+
+    Route::get('/declarations/{declaration}/documents', [AgentController::class, 'documents'])
+        ->name('agent.declaration.documents');
+
+    Route::post('declarations/{declaration}/valider', [AgentController::class, 'valider'])
+        ->name('agent.valider');
+
+    Route::post('declarations/{declaration}/rejeter', [AgentController::class, 'rejeter'])
+        ->name('agent.rejeter');
 });
 
 require __DIR__.'/auth.php';
