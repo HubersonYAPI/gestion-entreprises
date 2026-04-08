@@ -148,6 +148,35 @@ class DeclarationController extends Controller
     {
         $this->authorizeAccess($declaration);
 
+        // Types obligatoires
+        $typesObligatoires = [
+            'RCCM',
+            'CC',
+            'produits',
+            'appareils',
+            'formulaire'
+        ];
+
+        // Types déjà Ajouté
+        $typesPresents = $declaration->documents->pluck('type')->toArray();
+
+        // Vérifier les manquants
+        $manquants = array_diff($typesObligatoires, $typesPresents);
+
+        if (!empty($manquants)) {
+
+            $liste = collect($manquants)->map(function ($type) {
+                return $type . ' (non ajouté)';
+            })->implode(', ');
+
+            return back()->with(
+                'error',
+                'Impossible de soumettre. Documents manquants : ' . $liste
+            );
+        }
+
+        // ✅ OK → soumission
+
         $declaration->update([
             'statut' => 'soumis',
             'submitted_at' => now(),
