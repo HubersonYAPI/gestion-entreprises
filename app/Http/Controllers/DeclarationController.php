@@ -19,7 +19,7 @@ class DeclarationController extends Controller
 
         $declarations = Declaration::whereHas('entreprise', function($q) use($gerant){
             $q->where('gerant_id', $gerant->id);
-        })->latest()->get();
+        })->latest('updated_at')->get();
 
         return view('declarations.index', compact('declarations'));
     }

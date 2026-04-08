@@ -98,7 +98,6 @@
 
                 <form action="{{ route('declarations.submit', $declaration->id) }}" method="POST">
                     @csrf
-                    @method('PATCH')
 
                     <button type="submit"
                         class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">

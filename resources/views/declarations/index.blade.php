@@ -38,12 +38,14 @@
                         <x-heroicon-o-eye class="w-5 h-5"/>
                     </a>
                     
-                    <!-- 📄 Documents -->
-                    <a href="{{ route('documents.index', $declaration) }}" title="Documents" class="text-purple-600 hover:text-purple-800">
-                        <x-heroicon-o-document-text class="w-5 h-5"/>
-                    </a>
+                    
 
                     @if($declaration->statut === 'brouillon')
+
+                        <!-- 📄 Documents -->
+                        <a href="{{ route('documents.index', $declaration) }}" title="Documents" class="text-purple-600 hover:text-purple-800">
+                            <x-heroicon-o-document-text class="w-5 h-5"/>
+                        </a>
 
                         <!-- Modifier -->
                         <a href="{{ route('declarations.edit', $declaration) }}" title="Modifier" class="text-yellow-500 hover:text-yellow-700">

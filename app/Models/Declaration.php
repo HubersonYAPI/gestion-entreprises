@@ -3,10 +3,13 @@
 namespace App\Models;
 
 use App\Models\Document;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Declaration extends Model
 {
+    use HasFactory; 
+
     protected $fillable = [
         'entreprise_id',
         'reference',

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Declaration;
 use App\Models\Document;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 use function Symfony\Component\Clock\now;
 
@@ -99,10 +100,12 @@ class AgentController extends Controller
         }
         
         // Tout est OK
+        $dateLimite = Carbon::now()->addHours(48);
+
         $declaration->update([
             'statut' => 'validé',
             'validated_at' => now(),
-            'date_limite_paiement' => now()->addHours(48),
+            'date_limite_paiement' => Carbon::now()->addHours(48),
             'phase' => 3,
 
         ]);

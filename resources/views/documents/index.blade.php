@@ -47,7 +47,7 @@
                 </a>
 
                 <button class="bg-blue-600 text-white px-4 py-2 rounded">
-                    Upload
+                    Ajouter
                 </button>
             </div>
         </form>
