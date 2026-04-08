@@ -29,6 +29,24 @@
     </div>
     @endif
 
+    {{-- ── Filtres ── --}}
+    <div class="filters">
+        <a href="{{ route('declarations.index') }}"
+           class="flt {{ !request('statut') ? 'on':'' }}">Toutes</a>
+        <a href="{{ route('declarations.index', ['statut'=>'soumis']) }}"
+           class="flt {{ request('statut')==='soumis' ? 'on':'' }}">Soumises</a>
+        <a href="{{ route('declarations.index', ['statut'=>'validé']) }}"
+           class="flt {{ request('statut')==='validé' ? 'on':'' }}">Validées</a>
+        <a href="{{ route('declarations.index', ['statut'=>'rejete']) }}"
+           class="flt {{ request('statut')==='rejete' ? 'on':'' }}">Rejetées</a>
+        <a href="{{ route('declarations.index', ['statut'=>'non_paye']) }}"
+           class="flt {{ request('statut')==='non_paye' ? 'on':'' }}">Att. paiement</a>
+        <a href="{{ route('declarations.index', ['statut'=>'en_traitement']) }}"
+           class="flt {{ request('statut')==='en_traitement' ? 'on':'' }}">En traitement</a>
+        <a href="{{ route('declarations.index', ['statut'=>'finalise']) }}"
+           class="flt {{ request('statut')==='finalise' ? 'on':'' }}">Finalisées</a>
+    </div>
+
     {{-- Table --}}
     <div class="ucard">
         <div class="ucard-header">
@@ -117,6 +135,8 @@
             </table>
         </div>
     </div>
-
+@if($declarations->hasPages())
+        <div class="pager">{{ $declarations->links() }}</div>
+        @endif
 </div>
 </x-app-layout>

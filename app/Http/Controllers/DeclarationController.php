@@ -10,17 +10,34 @@ use Illuminate\Support\Str;
 
 class DeclarationController extends Controller
 {
-    /**
-     * Liste des déclarations
-     */
-    public function index()
+    private function getDeclarations($request)
     {
         $gerant = Auth::user()->gerant;
 
-        $declarations = Declaration::whereHas('entreprise', function($q) use($gerant){
-            $q->where('gerant_id', $gerant->id);
-        })->latest('updated_at')->get();
+        $query = Declaration::with('entreprise')
+            ->whereHas('entreprise', function ($q) use ($gerant) {
+                $q->where('gerant_id', $gerant->id);
+            });
 
+        if ($request->filled('statut')) {
+            $query->where('statut', $request->statut);
+        }
+
+        return $query->latest('updated_at')->paginate(10);
+    }
+    /**
+     * Dashboard + liste filtrée des déclarations du gérant
+     * Supporte le paramètre ?statut=xxx pour filtrer (identique à AgentController)
+     */
+    public function dashboard(Request $request)
+    {
+        $declarations = $this->getDeclarations($request);
+        return view('dashboard', compact('declarations'));
+    }
+
+    public function index(Request $request)
+    {
+        $declarations = $this->getDeclarations($request);
         return view('declarations.index', compact('declarations'));
     }
 
