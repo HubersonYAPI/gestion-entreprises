@@ -256,7 +256,7 @@ tbody tr:hover td{background:#f8f9fd;}
                 <tbody>
                 @forelse($declarations as $decl)
                     @php
-                        $sm = ['soumis'=>['Soumis','b-soumis'],'non_paye'=>['Non payé','b-np'],'en_traitement'=>['En traitement','b-trait'],'valide'=>['Validée','b-valid'],'rejete'=>['Rejetée','b-rej']];
+                        $sm = ['soumis'=>['Soumis','b-soumis'],'non_paye'=>['Non payé','b-np'],'en_traitement'=>['En traitement','b-trait'],'validé'=>['Validée','b-valid'],'rejeté'=>['Rejetée','b-rej']];
                         [$sl,$sc] = $sm[$decl->statut] ?? [ucfirst($decl->statut),'b-def'];
                     @endphp
                     <tr>

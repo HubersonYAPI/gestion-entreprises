@@ -156,4 +156,11 @@
 /* ── Empty state ── */
 .uempty { text-align:center; padding:2.5rem 1rem; color:var(--t3); font-size:.82rem; }
 .uempty svg { width:36px; height:36px; opacity:.2; margin:0 auto .65rem; display:block; }
+
+/* Filters */
+.filters { display:flex; align-items:center; gap:.45rem; flex-wrap:wrap; }
+.flt { font-size:.74rem; font-weight:600; padding:.32rem .8rem; border-radius:20px; border:1px solid var(--border); background:var(--white); color:var(--t2); cursor:pointer; text-decoration:none; transition:all .15s; white-space:nowrap; }
+.flt:hover { background:#eaedfa; color:var(--accent); border-color:#c7d0f5; }
+.flt.on { background:var(--accent); color:#fff; border-color:var(--accent); }
+
 </style>

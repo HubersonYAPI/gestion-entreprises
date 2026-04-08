@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'Laravel') }} — Admin</title>
+    <title>{{ config('app.name', 'Ges_Decl') }} — Admin</title>
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800&display=swap" rel="stylesheet"/>
@@ -387,12 +387,14 @@
         <a href="{{ route('agent.dashboard') }}" class="sidebar-brand">
             <div class="brand-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                    <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    {{-- <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                    <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/> --}}
+                    <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+                    <path d="M9 22V12h6v10"/>
                 </svg>
             </div>
-            <span class="brand-text">{{ config('app.name', 'GovAdmin') }}</span>
-            <span class="brand-badge">Admin</span>
+            <span class="brand-text">{{ config('app.name', 'Ges_Decl') }}</span>
+            <span class="brand-badge">Agent</span>
         </a>
 
         {{-- Navigation --}}
