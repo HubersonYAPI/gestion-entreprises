@@ -1,18 +1,19 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-theme="light">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'Ges_Decl') }} — Admin</title>
+    <title>{{ config('app.name', 'Laravel') }} — Admin</title>
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800&display=swap" rel="stylesheet"/>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/css/admin.css', 'resources/js/app.js'])
 
     <style>
-        /* ── CSS Variables ── */
-        :root {
+        /* ── CSS Variables light / dark ── */
+        :root,
+        [data-theme="light"] {
             --bg-body:       #f0f2f8;
             --bg-sidebar:    #ffffff;
             --bg-topbar:     #ffffff;
@@ -30,6 +31,24 @@
             --shadow-md:     0 4px 20px rgba(0,0,0,0.08);
         }
 
+        [data-theme="dark"] {
+            --bg-body:       #0d0f18;
+            --bg-sidebar:    #111320;
+            --bg-topbar:     #111320;
+            --bg-card:       #181b2a;
+            --bg-hover:      #1e2235;
+            --bg-active:     #1e2040;
+            --border:        rgba(255,255,255,0.07);
+            --text-primary:  #e8eaf0;
+            --text-secondary:#8892a4;
+            --text-muted:    #4b5563;
+            --accent:        #6366f1;
+            --accent-light:  rgba(99,102,241,0.15);
+            --accent-text:   #a5b4fc;
+            --shadow:        0 1px 4px rgba(0,0,0,0.3);
+            --shadow-md:     0 4px 20px rgba(0,0,0,0.4);
+        }
+
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
@@ -37,7 +56,7 @@
             background: var(--bg-body);
             color: var(--text-primary);
             min-height: 100vh;
-            transition: none;
+            transition: background 0.3s, color 0.3s;
         }
 
         /* ── Layout shell ── */
@@ -59,7 +78,7 @@
             position: fixed;
             top: 0; left: 0; bottom: 0;
             z-index: 40;
-            transition: width 0.25s ease, transform 0.25s ease;
+            transition: width 0.25s ease, transform 0.25s ease, background 0.3s;
             overflow: hidden;
         }
         .sidebar.collapsed { width: 64px; }
@@ -236,6 +255,7 @@
             position: sticky;
             top: 0;
             z-index: 30;
+            transition: background 0.3s;
             box-shadow: var(--shadow);
         }
 
@@ -272,6 +292,24 @@
             align-items: center;
             gap: 0.5rem;
         }
+
+        /* Theme toggle */
+        .theme-btn {
+            width: 34px; height: 34px;
+            border-radius: 8px;
+            background: var(--bg-hover);
+            border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.15s;
+        }
+        .theme-btn:hover { color: var(--text-primary); background: var(--bg-active); }
+        .theme-btn svg { width: 15px; height: 15px; }
+        .icon-sun { display: none; }
+        .icon-moon { display: block; }
+        [data-theme="dark"] .icon-sun  { display: block; }
+        [data-theme="dark"] .icon-moon { display: none; }
 
         /* Notif */
         .notif-btn {
@@ -375,8 +413,18 @@
         this.collapsed = !this.collapsed;
         localStorage.setItem('sidebar', this.collapsed ? 'collapsed' : 'open');
     },
-    toggleMenu(key) { this.openMenu = this.openMenu === key ? null : key; }
-}">
+    toggleMenu(key) { this.openMenu = this.openMenu === key ? null : key; },
+    toggleTheme() {
+        const html = document.documentElement;
+        const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+    },
+    initTheme() {
+        const saved = localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', saved);
+    }
+}" x-init="initTheme()">
 
 <div class="shell">
 
@@ -387,14 +435,12 @@
         <a href="{{ route('agent.dashboard') }}" class="sidebar-brand">
             <div class="brand-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    {{-- <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                    <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/> --}}
-                    <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
-                    <path d="M9 22V12h6v10"/>
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                    <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>
                 </svg>
             </div>
-            <span class="brand-text">{{ config('app.name', 'Ges_Decl') }}</span>
-            <span class="brand-badge">Agent</span>
+            <span class="brand-text">{{ config('app.name', 'GovAdmin') }}</span>
+            <span class="brand-badge">Admin</span>
         </a>
 
         {{-- Navigation --}}
@@ -602,6 +648,26 @@
 
             {{-- Actions --}}
             <div class="topbar-actions">
+
+                {{-- Theme toggle --}}
+                <button @click="toggleTheme()" class="theme-btn" title="Changer le thème">
+                    {{-- Soleil (mode dark → passer en light) --}}
+                    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5"/>
+                        <line x1="12" y1="1" x2="12" y2="3"/>
+                        <line x1="12" y1="21" x2="12" y2="23"/>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                        <line x1="1" y1="12" x2="3" y2="12"/>
+                        <line x1="21" y1="12" x2="23" y2="12"/>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+                    </svg>
+                    {{-- Lune (mode light → passer en dark) --}}
+                    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+                    </svg>
+                </button>
 
                 {{-- Notifications --}}
                 <a href="#" class="notif-btn">
