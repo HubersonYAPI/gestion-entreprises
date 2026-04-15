@@ -10,12 +10,18 @@ class RoleSeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     * Utilise firstOrCreate pour éviter les doublons si le seeder
+     * est appelé plusieurs fois.
      */
     public function run(): void
     {
-        Role::create(['name' => 'GERANT']);
-        Role::create(['name' => 'AGENT']);
-        Role::create(['name' => 'CONTROLEUR']);
-        Role::create(['name' => 'SUPER_ADMIN']);
+        $roles = ['GERANT', 'AGENT', 'CONTROLEUR', 'SUPER_ADMIN'];
+
+        foreach ($roles as $role) {
+            Role::firstOrCreate([
+                'name'       => $role,
+                'guard_name' => 'web',
+            ]);
+        }
     }
 }

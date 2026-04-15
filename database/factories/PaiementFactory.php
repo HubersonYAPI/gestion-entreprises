@@ -12,19 +12,25 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class PaiementFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
+    protected $model = Paiement::class;
+
     public function definition(): array
     {
         return [
             'declaration_id' => Declaration::factory(),
-            'montant' => 10000,
-            'reference' => 'PAY-' . strtoupper(Str::random(8)),
-            'statut' => 'payé',
-            'date_paiement' => now(),
+            'montant'        => 10000,
+            'reference'      => 'PAY-' . strtoupper(Str::random(8)),
+            'statut'         => 'payé',
+            'date_paiement'  => now()->subDays(rand(0, 5)),
         ];
+    }
+
+    /** Paiement en attente */
+    public function enAttente(): static
+    {
+        return $this->state(fn () => [
+            'statut'        => 'en_attente',
+            'date_paiement' => null,
+        ]);
     }
 }

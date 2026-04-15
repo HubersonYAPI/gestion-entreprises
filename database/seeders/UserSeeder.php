@@ -11,40 +11,44 @@ class UserSeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     * Utilise firstOrCreate pour éviter les doublons.
      */
     public function run(): void
     {
         // =====================
-        // ADMIN
+        // SUPER ADMIN
         // =====================
-        $admin = User::create([
-            'name' => 'Admin DSI',
-            'email' => 'admin@dsi.com',
-            'password' => Hash::make('Admin1234'),
-        ]);
-
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@dsi.com'],
+            [
+                'name'     => 'Admin DSI',
+                'password' => Hash::make('Admin1234'),
+            ]
+        );
         $admin->assignRole('SUPER_ADMIN');
 
         // =====================
         // AGENT
         // =====================
-        $agent = User::create([
-            'name' => 'Agent Industrie',
-            'email' => 'agent@ministere.com',
-            'password' => Hash::make('Agent1234'),
-        ]);
-
+        $agent = User::firstOrCreate(
+            ['email' => 'agent@ministere.com'],
+            [
+                'name'     => 'Agent Industrie',
+                'password' => Hash::make('Admin1234'),
+            ]
+        );
         $agent->assignRole('AGENT');
 
         // =====================
         // GERANT
         // =====================
-        $gerant = User::create([
-            'name' => 'Gerant Entreprise',
-            'email' => 'gerant@entreprise.com',
-            'password' => Hash::make('Gerant1234'),
-        ]);
-
+        $gerant = User::firstOrCreate(
+            ['email' => 'gerant@entreprise.com'],
+            [
+                'name'     => 'Gérant Entreprise',
+                'password' => Hash::make('Admin1234'),
+            ]
+        );
         $gerant->assignRole('GERANT');
     }
 }

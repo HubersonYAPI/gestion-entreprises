@@ -10,13 +10,18 @@ class EntrepriseFactory extends Factory
     public function definition(): array
     {
         return [
-            'gerant_id' => Gerant::factory(),
-            'nom' => $this->faker->company(),
-            'rccm' => 'RCCM-' . $this->faker->unique()->numberBetween(1000, 9999),
-            'adresse' => $this->faker->address(),
-            'type_entreprise' => $this->faker->randomElement(['SARL', 'SA', 'Entreprise individuelle']),
-            'secteur_activite' => $this->faker->randomElement(['Commerce', 'Industrie', 'Education', 'BTP',
-            'Informatique', 'Sport', 'Santé', 'Tourisme', 'Automobile', 'Agriculture', 'Communication', 'Service']),
+            'gerant_id'        => Gerant::factory(),
+            'nom'              => $this->faker->company(),
+            'rccm'             => 'RCCM-CI-' . $this->faker->unique()->numerify('####-#####'),
+            'adresse'          => $this->faker->address(),
+            'type_entreprise'  => $this->faker->randomElement([
+                'SARL', 'SA', 'SAS', 'Entreprise individuelle', 'GIE',
+            ]),
+            'secteur_activite' => $this->faker->randomElement([
+                'Commerce', 'Industrie', 'Éducation', 'BTP',
+                'Informatique', 'Santé', 'Tourisme', 'Agriculture',
+                'Automobile', 'Communication', 'Service',
+            ]),
         ];
     }
 }

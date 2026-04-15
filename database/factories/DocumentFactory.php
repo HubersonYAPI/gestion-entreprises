@@ -1,16 +1,5 @@
 <?php
 
-/*
-|--------------------------------------------------------------------------
-| database/factories/DocumentFactory.php
-|--------------------------------------------------------------------------
-| Permet de créer de faux documents pour les tests avec :
-|   Document::factory()->create([...])
-|
-| IMPORTANT : copiez ce fichier dans database/factories/DocumentFactory.php
-|--------------------------------------------------------------------------
-*/
-
 namespace Database\Factories;
 
 use App\Models\Document;
@@ -24,10 +13,8 @@ class DocumentFactory extends Factory
     public function definition(): array
     {
         return [
-            // Lié à une déclaration existante (créée automatiquement si absente)
             'declaration_id' => Declaration::factory(),
 
-            // Un des 5 types valides de votre application
             'type' => $this->faker->randomElement([
                 'RCCM',
                 'CC',
@@ -36,11 +23,23 @@ class DocumentFactory extends Factory
                 'formulaire',
             ]),
 
-            // Statut par défaut : en attente de validation
+            // Statut par défaut
             'statut' => 'en_attente',
 
-            // Chemin fictif vers un fichier (pas besoin d'un vrai fichier pour les tests)
+            // Chemin fictif (pas de vrai fichier requis pour les tests)
             'file_path' => 'documents/' . $this->faker->uuid() . '.pdf',
         ];
+    }
+
+    /** Document validé */
+    public function valide(): static
+    {
+        return $this->state(fn () => ['statut' => 'validé']);
+    }
+
+    /** Document rejeté */
+    public function rejete(): static
+    {
+        return $this->state(fn () => ['statut' => 'rejeté']);
     }
 }
