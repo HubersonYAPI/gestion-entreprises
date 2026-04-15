@@ -1,0 +1,65 @@
+# ============================================================
+# docker-compose.yml
+# Pour tester votre image Docker EN LOCAL avant de déployer
+# ⚠️  NE PAS utiliser en production (Render ne l'utilise pas)
+# Usage : docker-compose up --build
+# ============================================================
+
+version: '3.8'
+
+services:
+
+  # ── Application Laravel ────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "10000:10000"       # Accès : http://localhost:10000
+    environment:
+      APP_NAME: Ges_Decl
+      APP_ENV: production
+      APP_KEY: base64:Dh9rc4qBimBoRct+u/Euu5oMq/SFjeTD9WPYHe61okU=
+      APP_DEBUG: "false"
+      APP_URL: http://localhost:10000
+      APP_LOCALE: fr
+
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres         # Nom du service postgres ci-dessous
+      DB_PORT: 5432
+      DB_DATABASE: gestion_entreprises
+      DB_USERNAME: postgres
+      DB_PASSWORD: secret
+
+      SESSION_DRIVER: database
+      CACHE_STORE: database
+      QUEUE_CONNECTION: database
+      LOG_CHANNEL: stderr
+      LOG_LEVEL: debug
+      FILESYSTEM_DISK: local
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - storage_data:/var/www/html/storage/app/public
+
+  # ── PostgreSQL local ────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: gestion_entreprises
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5433:5432"             # Accès local : localhost:5433
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres_data:
+  storage_data:
