@@ -72,6 +72,8 @@ class EntrepriseController extends Controller
      */
     public function edit(Entreprise $entreprise)
     {
+        $this->authorizeAccess($entreprise);
+        
         return view('entreprises.edit', compact('entreprise'));
     }
 
@@ -80,6 +82,8 @@ class EntrepriseController extends Controller
      */
     public function update(Request $request, Entreprise $entreprise)
     {
+        $this->authorizeAccess($entreprise);
+
         $request->validate([
             'nom' => 'required',
             'rccm' => 'required',
@@ -98,8 +102,21 @@ class EntrepriseController extends Controller
      */
     public function destroy(Entreprise $entreprise)
     {
+        $this->authorizeAccess($entreprise);
+
         $entreprise->delete();
 
         return redirect()->route('entreprises.index')->with('success', 'Entreprise Supprimée');
+    }
+
+    /**
+     * Vérifie que l'entreprise appartient au gérant connecté.
+     * Sinon → erreur 403 (Accès interdit).
+     */
+    private function authorizeAccess(Entreprise $entreprise): void
+    {
+        if ($entreprise->gerant_id !== Auth::user()->gerant->id) {
+            abort(403, 'Accès non autorisé.');
+        }
     }
 }
