@@ -36,7 +36,7 @@ class AgentController extends Controller
             $query->where('statut', 'rejeté');
         }
 
-        $declarations = $query->latest()->paginate(10);
+        $declarations = $query->latest('updated_at')->paginate(10);
 
         // Statistiques pour le dashboard
         $stats = [
@@ -100,12 +100,12 @@ class AgentController extends Controller
         }
         
         // Tout est OK
-        $dateLimite = Carbon::now()->addHours(48);
+        $dateLimite = Carbon::now()->addHours(72);
 
         $declaration->update([
             'statut' => 'validé',
             'validated_at' => now(),
-            'date_limite_paiement' => Carbon::now()->addHours(48),
+            'date_limite_paiement' => $dateLimite,
             'phase' => 3,
 
         ]);

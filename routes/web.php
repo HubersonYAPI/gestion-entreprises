@@ -6,6 +6,7 @@ use App\Http\Controllers\GerantController;
 use App\Http\Controllers\DeclarationController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\AgentController;
+use App\Http\Controllers\PaiementController;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Declaration;
 use App\Models\Gerant;
@@ -42,6 +43,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/declarations/{declaration}/documents', [DocumentController::class, 'index'])->name('documents.index');
     Route::post('/declarations/{declaration}/documents', [DocumentController::class, 'store'])->name('documents.store');
     Route::delete('/documents/{document}', [DocumentController::class, 'destroy'])->name('documents.destroy');
+
+    Route::get('/paiement/{declaration}', [PaiementController::class, 'show'])->name('paiement.show');
+
+    Route::post('/paiement/{declaration}', [PaiementController::class, 'payer'])->name('paiement.payer');
 });
 
 /**

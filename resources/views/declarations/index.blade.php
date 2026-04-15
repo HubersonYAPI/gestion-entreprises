@@ -37,8 +37,8 @@
            class="flt {{ request('statut')==='soumis' ? 'on':'' }}">Soumises</a>
         <a href="{{ route('declarations.index', ['statut'=>'validé']) }}"
            class="flt {{ request('statut')==='validé' ? 'on':'' }}">Validées</a>
-        <a href="{{ route('declarations.index', ['statut'=>'rejete']) }}"
-           class="flt {{ request('statut')==='rejete' ? 'on':'' }}">Rejetées</a>
+        <a href="{{ route('declarations.index', ['statut'=>'rejeté']) }}"
+           class="flt {{ request('statut')==='rejeté' ? 'on':'' }}">Rejetées</a>
         <a href="{{ route('declarations.index', ['statut'=>'non_paye']) }}"
            class="flt {{ request('statut')==='non_paye' ? 'on':'' }}">Att. paiement</a>
         <a href="{{ route('declarations.index', ['statut'=>'en_traitement']) }}"
@@ -86,7 +86,7 @@
                             </span>
                         </td>
                         <td style="font-size:.74rem;color:var(--t3);white-space:nowrap">
-                            {{ $declaration->created_at->format('d/m/Y') }}
+                            {{ $declaration->updated_at->format('d/m/Y') }}
                         </td>
                         <td>
                             <div class="uactions">
@@ -118,6 +118,22 @@
                                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>
                                         </button>
                                     </form>
+
+                                @elseif($declaration->statut === 'rejeté')
+                                    {{-- Voir documents si rejeté --}}
+                                    <a href="{{ route('documents.index', $declaration) }}" class="uib uib-doc" title="Documents">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8"/></svg>
+                                    </a>
+
+                                @elseif($declaration->statut === 'validé')
+                                    {{-- Voir documents si Validé --}}
+                                    <a href="{{ route('paiement.show', $declaration) }}" class="uib uib-ok" title="Payer">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2" ry="2"/>
+        <line x1="2" y1="10" x2="22" y2="10"/>
+        <circle cx="7" cy="15" r="1"/>
+        <circle cx="11" cy="15" r="1"/>
+    </svg>
+</a>
                                 @endif
                             </div>
                         </td>

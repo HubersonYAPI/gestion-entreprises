@@ -266,7 +266,7 @@ tbody tr:hover td{background:#f8f9fd;}
                         <td class="mt">{{ $decl->secteur_activite ?? '—' }}</td>
                         <td><span class="bx {{ $sc }}">{{ $sl }}</span></td>
                         <td><span class="ph">{{ $decl->phase_label }}</span></td>
-                        <td style="white-space:nowrap;color:var(--t3);font-size:.73rem">{{ $decl->created_at->format('d/m/Y') }}</td>
+                        <td style="white-space:nowrap;color:var(--t3);font-size:.73rem">{{ $decl->updated_at->format('d/m/Y') }}</td>
                         <td>
                             <div class="acts">
                                 <a href="{{ route('agent.declarations.show', $decl) }}" class="bi bi-eye" title="Voir">
