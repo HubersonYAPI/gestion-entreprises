@@ -14,6 +14,13 @@ class DeclarationController extends Controller
     {
         $gerant = Auth::user()->gerant;
 
+        if (!$gerant) {
+        return redirect()
+            ->route('gerant.edit')
+            ->with('error', "Aucun Profil gérant trouvé.")
+            ->send();
+        }
+
         $query = Declaration::with('entreprise')
             ->whereHas('entreprise', function ($q) use ($gerant) {
                 $q->where('gerant_id', $gerant->id);
