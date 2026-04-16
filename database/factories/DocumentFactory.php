@@ -15,7 +15,7 @@ class DocumentFactory extends Factory
         return [
             'declaration_id' => Declaration::factory(),
 
-            'type' => $this->faker->randomElement([
+            'type' => fake()->randomElement([
                 'RCCM',
                 'CC',
                 'produits',
@@ -27,7 +27,7 @@ class DocumentFactory extends Factory
             'statut' => 'en_attente',
 
             // Chemin fictif (pas de vrai fichier requis pour les tests)
-            'file_path' => 'documents/' . $this->faker->uuid() . '.pdf',
+            'file_path' => 'documents/' . fake()->uuid() . '.pdf',
         ];
     }
 

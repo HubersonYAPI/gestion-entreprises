@@ -21,8 +21,7 @@ class DatabaseSeeder extends Seeder
         // ==============================
         // ROLES (idempotent)
         // ==============================
-        $roles = ['GERANT', 'AGENT', 'CONTROLEUR', 'SUPER_ADMIN'];
-        foreach ($roles as $role) {
+        foreach (['GERANT', 'AGENT', 'CONTROLEUR', 'SUPER_ADMIN'] as $role) {
             Role::firstOrCreate(['name' => $role, 'guard_name' => 'web']);
         }
 
@@ -32,9 +31,9 @@ class DatabaseSeeder extends Seeder
         $admin = User::firstOrCreate(
             ['email' => 'admin@dsi.com'],
             [
-                'name'               => 'Admin DSI',
-                'password'           => Hash::make('Admin1234'),
-                'email_verified_at'  => now(),
+                'name'              => 'Admin DSI',
+                'password'          => Hash::make('Admin1234'),
+                'email_verified_at' => now(),
             ]
         );
         $admin->syncRoles(['SUPER_ADMIN']);
@@ -46,9 +45,9 @@ class DatabaseSeeder extends Seeder
             $user = User::firstOrCreate(
                 ['email' => "agent$i@test.com"],
                 [
-                    'name'               => "Agent $i",
-                    'password'           => Hash::make('Admin1234'),
-                    'email_verified_at'  => now(),
+                    'name'              => "Agent $i",
+                    'password'          => Hash::make('Admin1234'),
+                    'email_verified_at' => now(),
                 ]
             );
             $user->syncRoles(['AGENT']);
@@ -61,9 +60,9 @@ class DatabaseSeeder extends Seeder
             $user = User::firstOrCreate(
                 ['email' => "controleur$i@test.com"],
                 [
-                    'name'               => "Contrôleur $i",
-                    'password'           => Hash::make('Admin1234'),
-                    'email_verified_at'  => now(),
+                    'name'              => "Contrôleur $i",
+                    'password'          => Hash::make('Admin1234'),
+                    'email_verified_at' => now(),
                 ]
             );
             $user->syncRoles(['CONTROLEUR']);
@@ -78,21 +77,30 @@ class DatabaseSeeder extends Seeder
             $user = User::firstOrCreate(
                 ['email' => "gerant$i@test.com"],
                 [
-                    'name'               => "Gérant $i",
-                    'password'           => Hash::make('Admin1234'),
-                    'email_verified_at'  => now(),
+                    'name'              => "Gérant $i",
+                    'password'          => Hash::make('Admin1234'),
+                    'email_verified_at' => now(),
                 ]
             );
             $user->syncRoles(['GERANT']);
 
-            // Gerant lié — firstOrCreate pour l'idempotence
-            $gerant = Gerant::firstOrCreate(['user_id' => $user->id]);
+            // *** CORRECTION PRINCIPALE ***
+            // firstOrCreate DOIT recevoir tous les champs NOT NULL dans le 2e argument
+            $gerant = Gerant::firstOrCreate(
+                ['user_id' => $user->id],              // critère de recherche
+                [                                       // valeurs si création
+                    'nom'            => "Nom$i",
+                    'prenoms'        => "Prénom $i",
+                    'contact'        => "070000000$i",
+                    'piece_identite' => 'documents/cni_placeholder.pdf',
+                ]
+            );
+
             $gerants->push($gerant);
         }
 
         // ==============================
-        // ENTREPRISES (10) — idempotentes via factory uniqueFor
-        // On ne recrée pas si le gerant a déjà des entreprises.
+        // ENTREPRISES (10)
         // ==============================
         $entreprises = collect();
         $gerant1     = $gerants->first();
@@ -101,7 +109,9 @@ class DatabaseSeeder extends Seeder
         $existing1 = Entreprise::where('gerant_id', $gerant1->id)->get();
         $toCreate1 = max(0, 4 - $existing1->count());
         for ($i = 0; $i < $toCreate1; $i++) {
-            $entreprises->push(Entreprise::factory()->create(['gerant_id' => $gerant1->id]));
+            $entreprises->push(
+                Entreprise::factory()->create(['gerant_id' => $gerant1->id])
+            );
         }
         $entreprises = $entreprises->merge($existing1);
 
@@ -110,19 +120,20 @@ class DatabaseSeeder extends Seeder
             $existing = Entreprise::where('gerant_id', $gerant->id)->get();
             $toCreate = max(0, 3 - $existing->count());
             for ($i = 0; $i < $toCreate; $i++) {
-                $entreprises->push(Entreprise::factory()->create(['gerant_id' => $gerant->id]));
+                $entreprises->push(
+                    Entreprise::factory()->create(['gerant_id' => $gerant->id])
+                );
             }
             $entreprises = $entreprises->merge($existing);
         }
 
         // ==============================
         // DECLARATIONS — Gérants 2 & 3
-        // On ne crée que si pas encore de déclarations
         // ==============================
         $autresEntreprises = $entreprises->where('gerant_id', '!=', $gerant1->id)->values();
         foreach ($autresEntreprises as $entreprise) {
             if (Declaration::where('entreprise_id', $entreprise->id)->exists()) {
-                continue; // déjà seeded
+                continue;
             }
             $nb = rand(1, 2);
             for ($i = 0; $i < $nb; $i++) {
@@ -135,8 +146,11 @@ class DatabaseSeeder extends Seeder
         // ==============================
         $entreprisesGerant1 = $entreprises->where('gerant_id', $gerant1->id)->values();
 
-        // Ne crée les déclarations que si pas encore présentes
-        $declExistantes = Declaration::whereIn('entreprise_id', $entreprisesGerant1->pluck('id'))->count();
+        $declExistantes = Declaration::whereIn(
+            'entreprise_id',
+            $entreprisesGerant1->pluck('id')
+        )->count();
+
         if ($declExistantes < 15) {
             $distribution = [
                 ['statut' => 'brouillon',           'phase' => 1, 'nb' => 4],
@@ -205,7 +219,9 @@ class DatabaseSeeder extends Seeder
 
     private function statutAleatoire(): string
     {
-        return collect(['brouillon', 'soumis', 'en_attente_paiement', 'validé', 'rejeté'])->random();
+        return collect([
+            'brouillon', 'soumis', 'en_attente_paiement', 'validé', 'rejeté',
+        ])->random();
     }
 
     private function phaseDepuisStatut(string $statut): int

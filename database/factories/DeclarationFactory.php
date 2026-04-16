@@ -33,14 +33,14 @@ class DeclarationFactory extends Factory
             'phase'  => 1,
 
             // Infos métier
-            'nature_activite'  => $this->faker->word(),
-            'secteur_activite' => $this->faker->randomElement([
+            'nature_activite'  => fake()->word(),
+            'secteur_activite' => fake()->randomElement([
                 'Commerce', 'Industrie', 'Éducation', 'BTP',
                 'Informatique', 'Santé', 'Tourisme', 'Agriculture',
                 'Communication', 'Service',
             ]),
-            'produits'  => $this->faker->sentence(),
-            'effectifs' => $this->faker->numberBetween(1, 200),
+            'produits'  => fake()->sentence(),
+            'effectifs' => fake()->numberBetween(1, 200),
 
             // Toutes les dates nullable par défaut
             'submitted_at'          => null,
