@@ -42,15 +42,19 @@ echo "[5/7] Seeders..."
  
 # Seeder des rôles Spatie (le plus important)
 echo "  → RoleSeeder..."
-php artisan db:seed --class=RoleSeeder --force --no-interaction 2>/dev/null \
-    && echo "  ✓ RoleSeeder OK" \
-    || echo "  ↻ RoleSeeder ignoré (déjà exécuté)"
+if php artisan db:seed --class=RoleSeeder --force; then
+    echo "  ✓ RoleSeeder OK"
+else
+    echo "  ✗ RoleSeeder ERREUR — vérifier les logs ci-dessus"
+    # On ne bloque pas le démarrage pour les seeders
+fi
  
-# DatabaseSeeder principal (SANS UserFactory s'il pose problème)
 echo "  → DatabaseSeeder..."
-php artisan db:seed --class=DatabaseSeeder --force --no-interaction 2>/dev/null \
-    && echo "  ✓ DatabaseSeeder OK" \
-    || echo "  ↻ DatabaseSeeder ignoré (erreur UserFactory connue)"
+if php artisan db:seed --class=DatabaseSeeder --force; then
+    echo "  ✓ DatabaseSeeder OK"
+else
+    echo "  ✗ DatabaseSeeder ERREUR — vérifier les logs ci-dessus"
+fi
 
 # ── 5. Nettoyage COMPLET des caches d'abord ──────────────────
 # Important : faire AVANT config:cache pour repartir proprement
