@@ -37,24 +37,24 @@ php artisan migrate --force --isolated 2>/dev/null \
     || php artisan migrate --force
 echo "  ✓ Migrations terminées"
 
-# ── 4. Seeders ────────────────────────────────────────────────
-echo "[5/7] Seeders..."
+# # ── 4. Seeders ────────────────────────────────────────────────
+# echo "[5/7] Seeders..."
  
-# Seeder des rôles Spatie (le plus important)
-echo "  → RoleSeeder..."
-if php artisan db:seed --class=RoleSeeder --force; then
-    echo "  ✓ RoleSeeder OK"
-else
-    echo "  ✗ RoleSeeder ERREUR — vérifier les logs ci-dessus"
-    # On ne bloque pas le démarrage pour les seeders
-fi
+# # Seeder des rôles Spatie (le plus important)
+# echo "  → RoleSeeder..."
+# if php artisan db:seed --class=RoleSeeder --force; then
+#     echo "  ✓ RoleSeeder OK"
+# else
+#     echo "  ✗ RoleSeeder ERREUR — vérifier les logs ci-dessus"
+#     # On ne bloque pas le démarrage pour les seeders
+# fi
  
-echo "  → DatabaseSeeder..."
-if php artisan db:seed --class=DatabaseSeeder --force; then
-    echo "  ✓ DatabaseSeeder OK"
-else
-    echo "  ✗ DatabaseSeeder ERREUR — vérifier les logs ci-dessus"
-fi
+# echo "  → DatabaseSeeder..."
+# if php artisan db:seed --class=DatabaseSeeder --force; then
+#     echo "  ✓ DatabaseSeeder OK"
+# else
+#     echo "  ✗ DatabaseSeeder ERREUR — vérifier les logs ci-dessus"
+# fi
 
 # ── 5. Nettoyage COMPLET des caches d'abord ──────────────────
 # Important : faire AVANT config:cache pour repartir proprement

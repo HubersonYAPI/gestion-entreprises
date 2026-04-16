@@ -7,8 +7,6 @@ use App\Models\Document;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
-use function Symfony\Component\Clock\now;
-
 class AgentController extends Controller
 {
     public function dashboard(Request $request)
@@ -104,7 +102,7 @@ class AgentController extends Controller
 
         $declaration->update([
             'statut' => 'validé',
-            'validated_at' => now(),
+            'validated_at' => Carbon::now(),
             'date_limite_paiement' => $dateLimite,
             'phase' => 3,
 

@@ -11,9 +11,9 @@ class GerantFactory extends Factory
     {
         return [
             'user_id'        => User::factory(),
-            'nom'            => fake()->lastName(),
-            'prenoms'        => fake()->firstName(),
-            'contact'        => fake()->phoneNumber(),
+            'nom'            => $this->faker->lastName(),
+            'prenoms'        => $this->faker->firstName(),
+            'contact'        => $this->faker->phoneNumber(),
             'piece_identite' => 'documents/cni_placeholder.pdf',
         ];
     }

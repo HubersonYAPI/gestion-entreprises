@@ -11,13 +11,13 @@ class EntrepriseFactory extends Factory
     {
         return [
             'gerant_id'        => Gerant::factory(),
-            'nom'              => fake()->company(),
-            'rccm'             => 'RCCM-CI-' . fake()->unique()->numerify('####-#####'),
-            'adresse'          => fake()->address(),
-            'type_entreprise'  => fake()->randomElement([
+            'nom'              => $this->faker->company(),
+            'rccm'             => 'RCCM-CI-' . $this->faker->unique()->numerify('####-#####'),
+            'adresse'          => $this->faker->address(),
+            'type_entreprise'  => $this->faker->randomElement([
                 'SARL', 'SA', 'SAS', 'Entreprise individuelle', 'GIE',
             ]),
-            'secteur_activite' => fake()->randomElement([
+            'secteur_activite' => $this->faker->randomElement([
                 'Commerce', 'Industrie', 'Éducation', 'BTP',
                 'Informatique', 'Santé', 'Tourisme', 'Agriculture',
                 'Automobile', 'Communication', 'Service',

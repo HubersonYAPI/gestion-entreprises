@@ -16,9 +16,6 @@ class UserFactory extends Factory
 
     public function definition(): array
     {
-        // On évite $this->faker->name() qui peut être null si la locale
-        // n'est pas chargée (problème fréquent sur Render / Docker).
-        // On utilise fake() (helper global Laravel) qui est toujours initialisé.
         return [
             'name'               => fake()->name(),
             'email'              => fake()->unique()->safeEmail(),

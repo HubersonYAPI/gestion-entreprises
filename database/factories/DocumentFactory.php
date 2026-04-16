@@ -15,7 +15,7 @@ class DocumentFactory extends Factory
         return [
             'declaration_id' => Declaration::factory(),
 
-            'type' => fake()->randomElement([
+            'type' => $this->faker->randomElement([
                 'RCCM',
                 'CC',
                 'produits',
@@ -27,19 +27,19 @@ class DocumentFactory extends Factory
             'statut' => 'en_attente',
 
             // Chemin fictif (pas de vrai fichier requis pour les tests)
-            'file_path' => 'documents/' . fake()->uuid() . '.pdf',
+            'file_path' => 'documents/' . $this->faker->uuid() . '.pdf',
         ];
     }
 
     /** Document validé */
     public function valide(): static
     {
-        return $this->state(fn () => ['statut' => 'validé']);
+        return $this->state(fn () => ['statut' => 'valide']);
     }
 
     /** Document rejeté */
     public function rejete(): static
     {
-        return $this->state(fn () => ['statut' => 'rejeté']);
+        return $this->state(fn () => ['statut' => 'rejete']);
     }
 }

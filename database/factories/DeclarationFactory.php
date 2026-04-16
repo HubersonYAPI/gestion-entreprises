@@ -33,14 +33,14 @@ class DeclarationFactory extends Factory
             'phase'  => 1,
 
             // Infos métier
-            'nature_activite'  => fake()->word(),
-            'secteur_activite' => fake()->randomElement([
+            'nature_activite'  => $this->faker->word(),
+            'secteur_activite' => $this->faker->randomElement([
                 'Commerce', 'Industrie', 'Éducation', 'BTP',
                 'Informatique', 'Santé', 'Tourisme', 'Agriculture',
                 'Communication', 'Service',
             ]),
-            'produits'  => fake()->sentence(),
-            'effectifs' => fake()->numberBetween(1, 200),
+            'produits'  => $this->faker->sentence(),
+            'effectifs' => $this->faker->numberBetween(1, 200),
 
             // Toutes les dates nullable par défaut
             'submitted_at'          => null,
@@ -80,7 +80,7 @@ class DeclarationFactory extends Factory
     public function valide(): static
     {
         return $this->state(fn () => [
-            'statut'                => 'validé',
+            'statut'                => 'valide',
             'phase'                 => 4,
             'submitted_at'          => now()->subDays(rand(8, 15)),
             'validated_at'          => now()->subDays(rand(4, 7)),
@@ -94,7 +94,7 @@ class DeclarationFactory extends Factory
     public function rejete(): static
     {
         return $this->state(fn () => [
-            'statut'       => 'rejeté',
+            'statut'       => 'rejete',
             'phase'        => 2,
             'submitted_at' => now()->subDays(rand(3, 10)),
             'processed_at' => now()->subDays(rand(1, 3)),

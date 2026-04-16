@@ -18,7 +18,7 @@ class PaiementFactory extends Factory
     {
         return [
             'declaration_id' => Declaration::factory(),
-            'montant'        => 10000,
+            'montant'        => $this->faker->randomElement([10000, 25000, 50000, 75000, 100000]),
             'reference'      => 'PAY-' . strtoupper(Str::random(8)),
             'statut'         => 'payé',
             'date_paiement'  => now()->subDays(rand(0, 5)),
