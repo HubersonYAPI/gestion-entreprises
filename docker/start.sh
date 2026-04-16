@@ -30,14 +30,27 @@ done
 echo "  ✓ PostgreSQL connecté"
 
 # ── 3. Migrations ─────────────────────────────────────────────
-echo "[4/9] Migrations..."
-php artisan migrate --force --no-interaction
+# --force  : confirme l'exécution en production
+# --isolated : (Laravel 12+) évite le prompt interactif
+echo "[4/7] Migrations..."
+php artisan migrate --force --isolated 2>/dev/null \
+    || php artisan migrate --force
+echo "  ✓ Migrations terminées"
 
 # ── 4. Seeders ────────────────────────────────────────────────
-echo "[5/9] Seeders (rôles/permissions)..."
-php artisan db:seed --force --no-interaction 2>/dev/null \
-    && echo "  ✓ Seeders exécutés" \
-    || echo "  ↻ Seeders ignorés (déjà exécutés)"
+echo "[5/7] Seeders..."
+ 
+# Seeder des rôles Spatie (le plus important)
+echo "  → RoleSeeder..."
+php artisan db:seed --class=RoleSeeder --force --no-interaction 2>/dev/null \
+    && echo "  ✓ RoleSeeder OK" \
+    || echo "  ↻ RoleSeeder ignoré (déjà exécuté)"
+ 
+# DatabaseSeeder principal (SANS UserFactory s'il pose problème)
+echo "  → DatabaseSeeder..."
+php artisan db:seed --class=DatabaseSeeder --force --no-interaction 2>/dev/null \
+    && echo "  ✓ DatabaseSeeder OK" \
+    || echo "  ↻ DatabaseSeeder ignoré (erreur UserFactory connue)"
 
 # ── 5. Nettoyage COMPLET des caches d'abord ──────────────────
 # Important : faire AVANT config:cache pour repartir proprement

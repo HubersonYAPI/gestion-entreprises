@@ -17,7 +17,6 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id'            => User::factory(),
             'name'               => $this->faker->name(),
             'email'              => $this->faker->safeEmail(),
             'email_verified_at'  => now(),
