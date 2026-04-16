@@ -33,6 +33,12 @@ echo "  ✓ PostgreSQL connecté"
 echo "[4/9] Migrations..."
 php artisan migrate --force --no-interaction
 
+# ── 4. Seeders ────────────────────────────────────────────────
+echo "[5/9] Seeders (rôles/permissions)..."
+php artisan db:seed --force --no-interaction 2>/dev/null \
+    && echo "  ✓ Seeders exécutés" \
+    || echo "  ↻ Seeders ignorés (déjà exécutés)"
+
 # ── 5. Nettoyage COMPLET des caches d'abord ──────────────────
 # Important : faire AVANT config:cache pour repartir proprement
 echo "[2/9] Nettoyage des caches..."
