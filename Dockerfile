@@ -1,35 +1,31 @@
 # ============================================================
-# Dockerfile — Laravel production (Render.com)
-# Chemin : à la racine du projet (même niveau que composer.json)
+# Dockerfile — VERSION CORRIGÉE pour Render.com
 # ============================================================
 
-# ── Étape 1 : build des assets frontend (Node + Vite) ───────
+# ── Étape 1 : Build frontend (Node + Vite) ───────────────────
 FROM node:20-alpine AS frontend-builder
 
 WORKDIR /app
 
-# Copier uniquement les fichiers nécessaires à npm
 COPY package.json package-lock.json* ./
-RUN npm ci
+RUN npm ci --silent
 
-# Copier les sources frontend
 COPY resources/ resources/
 COPY vite.config.js ./
-COPY tailwind.config.js* ./
-COPY postcss.config.js* ./
+# Ces fichiers sont optionnels selon votre config
+COPY tailwind.config.js ./
+COPY postcss.config.js  ./
 
-# Compiler les assets (génère public/build/)
 RUN npm run build
 
 
-# ── Étape 2 : image PHP finale ───────────────────────────────
+# ── Étape 2 : Image PHP production ───────────────────────────
 FROM php:8.3-fpm-alpine
 
-# Variables d'environnement internes
 ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV COMPOSER_NO_INTERACTION=1
 
-# ── Dépendances système ──────────────────────────────────────
+# Dépendances système
 RUN apk add --no-cache \
     nginx \
     supervisor \
@@ -62,13 +58,12 @@ RUN apk add --no-cache \
         opcache \
         xml
 
-# ── Composer ─────────────────────────────────────────────────
+# Composer
 COPY --from=composer:2.7 /usr/bin/composer /usr/bin/composer
 
-# ── Répertoire de travail ─────────────────────────────────────
 WORKDIR /var/www/html
 
-# ── Dépendances PHP (production uniquement) ───────────────────
+# Dépendances PHP (production)
 COPY composer.json composer.lock ./
 RUN composer install \
     --no-dev \
@@ -76,34 +71,34 @@ RUN composer install \
     --no-scripts \
     --no-interaction
 
-# ── Code source ───────────────────────────────────────────────
+# Code source complet
 COPY . .
 
-# ── Assets compilés depuis l'étape frontend ───────────────────
+# Assets compilés depuis l'étape frontend
 COPY --from=frontend-builder /app/public/build public/build
 
-# ── Permissions ───────────────────────────────────────────────
+# ── CORRECTIF : s'assurer que storage et bootstrap/cache existent ──
+RUN mkdir -p \
+    storage/app/public \
+    storage/framework/cache/data \
+    storage/framework/sessions \
+    storage/framework/views \
+    storage/logs \
+    bootstrap/cache
+
+# Permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
     && chmod -R 755 /var/www/html/bootstrap/cache
 
-# ── Configuration Nginx ───────────────────────────────────────
-COPY docker/nginx.conf /etc/nginx/http.d/default.conf
-
-# ── Configuration PHP-FPM ─────────────────────────────────────
-COPY docker/php-fpm.conf /usr/local/etc/php-fpm.d/www.conf
-
-# ── Configuration PHP (opcache production) ────────────────────
-COPY docker/php.ini /usr/local/etc/php/conf.d/99-custom.ini
-
-# ── Supervisor (gère Nginx + PHP-FPM ensemble) ────────────────
+# Configs Docker
+COPY docker/nginx.conf       /etc/nginx/http.d/default.conf
+COPY docker/php-fpm.conf     /usr/local/etc/php-fpm.d/www.conf
+COPY docker/php.ini          /usr/local/etc/php/conf.d/99-custom.ini
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-
-# ── Script de démarrage ───────────────────────────────────────
-COPY docker/start.sh /start.sh
+COPY docker/start.sh         /start.sh
 RUN chmod +x /start.sh
 
-# Port exposé (Render détecte le port 10000 par défaut)
 EXPOSE 10000
 
 CMD ["/start.sh"]

@@ -1,52 +1,73 @@
 #!/bin/sh
+# ============================================================
+# docker/start.sh — VERSION CORRIGÉE
+# Ordre : cache AVANT migrations (pour que config soit lisible)
+# ============================================================
 
 set -e
 
 echo "========================================"
-echo " Démarrage de Ges_Decl sur Render"
+echo " Démarrage Ges_Decl — $(date)"
 echo "========================================"
 
-# 1. Storage link
-echo "[1/8] Lien symbolique storage..."
-php artisan storage:link --force || true
+# ── 1. Lien symbolique storage ───────────────────────────────
+echo "[1/9] Lien symbolique storage..."
+php artisan storage:link --force 2>/dev/null || true
 
-# 2. Attendre PostgreSQL
-echo "[2/8] Attente de la base de données..."
+# ── 2. Attendre PostgreSQL ───────────────────────────────────
+echo "[3/9] Attente de PostgreSQL..."
+RETRIES=30
+COUNT=0
 until php artisan db:show --quiet 2>/dev/null; do
-    echo "  ↻ PostgreSQL pas encore prêt, nouvelle tentative dans 3s..."
-    sleep 3
+    COUNT=$((COUNT + 1))
+    if [ $COUNT -ge $RETRIES ]; then
+        echo "  ✗ PostgreSQL non joignable après ${RETRIES} tentatives. Abandon."
+        exit 1
+    fi
+    echo "  ↻ Tentative $COUNT/$RETRIES dans 5s..."
+    sleep 5
 done
 echo "  ✓ PostgreSQL connecté"
 
-# 3. Migrations
-echo "[3/8] Migrations..."
+# ── 3. Migrations ─────────────────────────────────────────────
+echo "[4/9] Migrations..."
 php artisan migrate --force --no-interaction
 
-# 4. Seeders
-echo "[4/8] Seeders..."
-php artisan db:seed --force --no-interaction || echo "  ↻ Seed déjà exécuté"
+# ── 5. Nettoyage COMPLET des caches d'abord ──────────────────
+# Important : faire AVANT config:cache pour repartir proprement
+echo "[2/9] Nettoyage des caches..."
+php artisan view:clear   --quiet
+php artisan cache:clear  --quiet
+php artisan config:clear --quiet
+php artisan route:clear  --quiet
+php artisan optimize:clear --quiet
+php artisan event:clear  --quiet 2>/dev/null || true
 
-# 5. Nettoyage cache (MAINTENANT c’est safe)
-echo "[5/8] Nettoyage des caches..."
-php artisan view:clear
-php artisan cache:clear
-php artisan config:clear
-php artisan route:clear
-php artisan optimize:clear
-
-# 6. Optimisation
-echo "[6/8] Optimisation production..."
+# ── 6. Optimisation production ────────────────────────────────
+echo "[6/9] Optimisation production..."
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
-php artisan event:cache
+php artisan event:cache 2>/dev/null || true
 
-# 7. Permissions
-echo "[7/8] Permissions..."
-chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+# ── 7. Permissions ────────────────────────────────────────────
+echo "[7/9] Permissions..."
+chown -R www-data:www-data \
+    /var/www/html/storage \
+    /var/www/html/bootstrap/cache
+chmod -R 775 \
+    /var/www/html/storage \
+    /var/www/html/bootstrap/cache
 
-# 8. Start services
-echo "[8/8] Lancement des serveurs..."
+# ── 8. Vérification finale ────────────────────────────────────
+echo "[8/9] Vérification..."
+echo "  APP_URL     = ${APP_URL}"
+echo "  DB_HOST     = ${DB_HOST}"
+echo "  DB_DATABASE = ${DB_DATABASE}"
+echo "  APP_ENV     = ${APP_ENV}"
+echo "  APP_DEBUG   = ${APP_DEBUG}"
+
+# ── 9. Lancer les serveurs ────────────────────────────────────
+echo "[9/9] Lancement Nginx + PHP-FPM via Supervisor..."
 echo "========================================"
 exec supervisord -c /etc/supervisor/conf.d/supervisord.conf
