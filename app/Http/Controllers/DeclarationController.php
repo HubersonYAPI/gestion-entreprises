@@ -21,7 +21,7 @@ class DeclarationController extends Controller
             ->send();
         }
 
-        $query = Declaration::with('entreprise')
+        $query = Declaration::with(['entreprise', 'attestation:id,declaration_id,file_path'])
             ->whereHas('entreprise', function ($q) use ($gerant) {
                 $q->where('gerant_id', $gerant->id);
             });

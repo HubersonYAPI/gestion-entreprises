@@ -67,7 +67,7 @@
             <div class="field">
                 <span class="field-l">Statut</span>
                 @php
-                    $sm=['soumis'=>['Soumis','b-soumis'],'non_paye'=>['Non payé','b-np'],'en_traitement'=>['En traitement','b-trait'],'valide'=>['Validée','b-valid'],'rejete'=>['Rejetée','b-rej']];
+                    $sm=['soumis'=>['Soumis','b-soumis'],'non_paye'=>['Non payé','b-np'],'en_traitement'=>['En traitement','b-trait'],'validé'=>['Validée','b-valid'],'rejeté'=>['Rejetée','b-rej']];
                     [$sl,$sc]=$sm[$declaration->statut]??[ucfirst($declaration->statut),'b-def'];
                 @endphp
                 <span class="field-v"><span class="bx {{ $sc }}">{{ $sl }}</span></span>

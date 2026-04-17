@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Document;
 use App\Models\Paiement;
+use App\Models\Attestation;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -55,5 +56,10 @@ class Declaration extends Model
     public function paiement()
     {
         return $this->hasOne(Paiement::class);
+    }
+
+    public function attestation()
+    {
+        return $this->hasOne(Attestation::class);
     }
 }

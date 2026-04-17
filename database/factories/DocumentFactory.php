@@ -34,12 +34,12 @@ class DocumentFactory extends Factory
     /** Document validé */
     public function valide(): static
     {
-        return $this->state(fn () => ['statut' => 'valide']);
+        return $this->state(fn () => ['statut' => 'validé']);
     }
 
     /** Document rejeté */
     public function rejete(): static
     {
-        return $this->state(fn () => ['statut' => 'rejete']);
+        return $this->state(fn () => ['statut' => 'rejeté']);
     }
 }

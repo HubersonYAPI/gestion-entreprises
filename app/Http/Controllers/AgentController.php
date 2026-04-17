@@ -42,8 +42,8 @@ class AgentController extends Controller
             'soumis' => Declaration::where('statut', 'soumis')->count(),
             'non_paye' => Declaration::where('statut', 'non_paye')->count(),
             'en_traitement' => Declaration::where('statut', 'en_traitement')->count(),
-            'valide' => Declaration::where('statut', 'validé')->count(),
-            'rejete' => Declaration::where('statut', 'rejeté')->count(),
+            'validé' => Declaration::where('statut', 'validé')->count(),
+            'rejeté' => Declaration::where('statut', 'rejeté')->count(),
         ];
 
         return view('agent.dashboard', compact('declarations',  'stats'));

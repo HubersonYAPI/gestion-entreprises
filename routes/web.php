@@ -7,6 +7,7 @@ use App\Http\Controllers\DeclarationController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\AgentController;
 use App\Http\Controllers\PaiementController;
+use App\Http\Controllers\TraitementController;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Declaration;
 use App\Models\Gerant;
@@ -48,6 +49,8 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/paiement/{declaration}', [PaiementController::class, 'payer'])->name('paiement.payer');
 });
+
+
 
 /**
  * Routes Agent / Admin — UN SEUL groupe
@@ -93,6 +96,11 @@ Route::prefix('agent')
     Route::get('/admin/utilisateurs', [AgentController::class, 'dashboard'])->name('admin.utilisateurs');
     Route::get('/admin/roles',        [AgentController::class, 'dashboard'])->name('admin.roles');
     Route::get('/admin/logs',         [AgentController::class, 'dashboard'])->name('admin.logs');
+
+    Route::post('/declarations/{declaration}/traiter', [TraitementController::class, 'traiter'])
+    ->name('traiter');
+    Route::post('/declarations/{declaration}/terminer', [TraitementController::class, 'terminer'])
+    ->name('terminer');
 });
  
 

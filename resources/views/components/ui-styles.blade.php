@@ -163,4 +163,101 @@
 .flt:hover { background:#eaedfa; color:var(--accent); border-color:#c7d0f5; }
 .flt.on { background:var(--accent); color:#fff; border-color:var(--accent); }
 
+/* Bouton Mettre en Traitement inline (avec label) */
+.bv {
+    display: inline-flex; align-items: center; gap: .3rem;
+    font-size: .71rem; font-weight: 700;
+    padding: .28rem .65rem; border-radius: 6px;
+    border: 1px solid #a7f3d0; background: #ecfdf5; color: #059669;
+    cursor: pointer; transition: all .15s;
+}
+.bv:hover   { background: #d1fae5; }
+.bv svg     { width: 12px; height: 12px; }
+
+/* ── Dropdown Actions ── */
+.act-wrap { position:relative; display:inline-block; }
+
+.act-btn {
+    display:inline-flex; align-items:center; gap:.4rem;
+    padding:.32rem .75rem; border-radius:7px;
+    border:1px solid var(--border); background:#f8f9fb;
+    font-size:.75rem; font-weight:600; color:var(--t2);
+    cursor:pointer; transition:all .15s; white-space:nowrap;
+    box-shadow:0 1px 2px rgba(0,0,0,.04);
+}
+.act-btn:hover { background:#eef0f6; border-color:#c8cdd8; color:var(--t1); }
+.act-btn svg { width:13px; height:13px; }
+.act-btn .chev { width:10px; height:10px; opacity:.45; transition:transform .18s; }
+.act-wrap.open .act-btn { background:#eef0f6; border-color:#c8cdd8; }
+.act-wrap.open .act-btn .chev { transform:rotate(180deg); }
+
+.act-menu {
+    position:absolute; right:0; top:calc(100% + 6px);
+    min-width:195px; background:#fff;
+    border:1px solid #e2e6f0; border-radius:11px;
+    box-shadow:0 10px 36px rgba(0,0,0,.13), 0 2px 8px rgba(0,0,0,.06);
+    padding:.35rem; z-index:200;
+    display:none; flex-direction:column; gap:2px;
+    animation:dropIn .12s ease;
+}
+@keyframes dropIn {
+    from { opacity:0; transform:translateY(-5px); }
+    to   { opacity:1; transform:translateY(0); }
+}
+.act-wrap.open .act-menu { display:flex; }
+
+.act-item {
+    display:flex; align-items:center; gap:.65rem;
+    padding:.44rem .7rem; border-radius:7px;
+    font-size:.78rem; font-weight:500;
+    text-decoration:none; cursor:pointer;
+    border:none; width:100%; text-align:left;
+    transition:background .12s, color .12s;
+    color:var(--t2); background:none;
+}
+.act-item .act-ico {
+    width:27px; height:27px; border-radius:7px;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0; transition:transform .12s;
+}
+.act-item:hover .act-ico { transform:scale(1.1); }
+.act-item svg { width:13px; height:13px; }
+.act-sep { height:1px; background:#f0f2f7; margin:.2rem 0; }
+
+/* ── Couleurs ── */
+/* Voir — bleu */
+.act-item.c-view       { color:#1d4ed8; }
+.act-item.c-view:hover { background:#eff6ff; }
+.act-item.c-view .act-ico { background:#dbeafe; color:#1d4ed8; }
+
+/* Documents — violet */
+.act-item.c-doc       { color:#6d28d9; }
+.act-item.c-doc:hover { background:#f5f3ff; }
+.act-item.c-doc .act-ico { background:#ede9fe; color:#6d28d9; }
+
+/* Modifier — ambre */
+.act-item.c-edit       { color:#b45309; }
+.act-item.c-edit:hover { background:#fffbeb; }
+.act-item.c-edit .act-ico { background:#fef3c7; color:#d97706; }
+
+/* Soumettre — vert */
+.act-item.c-submit       { color:#065f46; }
+.act-item.c-submit:hover { background:#ecfdf5; }
+.act-item.c-submit .act-ico { background:#d1fae5; color:#059669; }
+
+/* Payer — émeraude foncé */
+.act-item.c-pay       { color:#047857; }
+.act-item.c-pay:hover { background:#ecfdf5; }
+.act-item.c-pay .act-ico { background:#a7f3d0; color:#059669; }
+
+/* Télécharger — cyan */
+.act-item.c-dl       { color:#0e7490; }
+.act-item.c-dl:hover { background:#ecfeff; }
+.act-item.c-dl .act-ico { background:#cffafe; color:#0891b2; }
+
+/* Supprimer — rouge */
+.act-item.c-del       { color:#b91c1c; }
+.act-item.c-del:hover { background:#fef2f2; }
+.act-item.c-del .act-ico { background:#fee2e2; color:#dc2626; }
+
 </style>

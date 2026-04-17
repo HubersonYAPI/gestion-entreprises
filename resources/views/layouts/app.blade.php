@@ -107,8 +107,8 @@
         .sb-ft  { padding: .6rem .45rem; border-top: 1px solid var(--sb-bdr); flex-shrink: 0; }
 
         /* ══ MAIN ══ */
-        .main { flex: 1; margin-left: 240px; display: flex; flex-direction: column; min-height: 100vh; transition: margin-left .25s ease; }
-        .main.col { margin-left: 60px; }
+        .main { flex: 1; margin-left: 240px; display: flex; flex-direction: column; min-height: 100vh; transition: margin-left .25s ease; min-width: 0; overflow-x: hidden; max-width: calc(100vw - 240px); }
+        .main.col { margin-left: 60px; max-width: calc(100vw - 60px); }
 
         /* Topbar */
         .topbar {
@@ -175,7 +175,7 @@
         .tb-ds { height: 1px; background: var(--border); margin: .25rem 0; }
 
         /* Page content */
-        .page-content { flex: 1; padding: 1.75rem; }
+        .page-content { flex: 1; padding: 1.75rem; min-width: 0; overflow-x: hidden; width: 100%; box-sizing: border-box; }
 
         /* Mobile */
         .sb-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 49; }
@@ -262,12 +262,12 @@
                            class="sb-sl {{ request('statut')==='soumis' ? 'act':'' }}">
                             <span class="sdot" style="background:#3b82f6"></span>Soumises
                         </a>
-                        <a href="{{ route('declarations.index', ['statut'=>'valide']) }}"
-                           class="sb-sl {{ request('statut')==='valide' ? 'act':'' }}">
+                        <a href="{{ route('declarations.index', ['statut'=>'validé']) }}"
+                           class="sb-sl {{ request('statut')==='validé' ? 'act':'' }}">
                             <span class="sdot" style="background:#10b981"></span>Validées
                         </a>
-                        <a href="{{ route('declarations.index', ['statut'=>'rejete']) }}"
-                           class="sb-sl {{ request('statut')==='rejete' ? 'act':'' }}">
+                        <a href="{{ route('declarations.index', ['statut'=>'rejeté']) }}"
+                           class="sb-sl {{ request('statut')==='rejeté' ? 'act':'' }}">
                             <span class="sdot" style="background:#ef4444"></span>Rejetées
                         </a>
                         <a href="{{ route('declarations.index', ['statut'=>'non_paye']) }}"

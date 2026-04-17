@@ -138,8 +138,8 @@ class DatabaseSeeder extends Seeder
             ['statut' => 'brouillon',           'phase' => 1, 'nb' => 4],
             ['statut' => 'soumis',              'phase' => 2, 'nb' => 3],
             ['statut' => 'en_attente_paiement', 'phase' => 3, 'nb' => 3],
-            ['statut' => 'valide',              'phase' => 4, 'nb' => 3],
-            ['statut' => 'rejete',              'phase' => 2, 'nb' => 2],
+            ['statut' => 'validé',              'phase' => 4, 'nb' => 3],
+            ['statut' => 'rejeté',              'phase' => 2, 'nb' => 2],
         ];
 
         foreach ($distribution as $groupe) {
@@ -173,28 +173,28 @@ class DatabaseSeeder extends Seeder
         ];
 
         // Ajout des dates selon l'avancement
-        if (in_array($statut, ['soumis', 'en_attente_paiement', 'valide', 'rejete'])) {
+        if (in_array($statut, ['soumis', 'en_attente_paiement', 'validé', 'rejeté'])) {
             $data['submitted_at'] = now()->subDays(rand(3, 10));
         }
 
-        if (in_array($statut, ['en_attente_paiement', 'valide'])) {
+        if (in_array($statut, ['en_attente_paiement', 'validé'])) {
             $data['validated_at']         = now()->subDays(rand(1, 4));
             $data['date_limite_paiement'] = now()->addDays(rand(3, 7));
         }
 
-        if ($statut === 'valide') {
+        if ($statut === 'validé') {
             $data['paid_at']      = now()->subDays(rand(0, 2));
             $data['completed_at'] = now()->subDays(rand(0, 1));
         }
 
-        if ($statut === 'rejete') {
+        if ($statut === 'rejeté') {
             $data['processed_at'] = now()->subDays(rand(1, 3));
         }
 
         $declaration = Declaration::factory()->create($data);
 
         // Créer le paiement si la déclaration est validée
-        if ($statut === 'valide') {
+        if ($statut === 'validé') {
             Paiement::factory()->create([
                 'declaration_id' => $declaration->id,
                 'statut'         => 'payé',
@@ -214,8 +214,8 @@ class DatabaseSeeder extends Seeder
             'brouillon',
             'soumis',
             'en_attente_paiement',
-            'valide',
-            'rejete',
+            'validé',
+            'rejeté',
         ])->random();
     }
 
@@ -227,9 +227,9 @@ class DatabaseSeeder extends Seeder
         return match ($statut) {
             'brouillon'           => 1,
             'soumis'              => 2,
-            'rejete'              => 2,
+            'rejeté'              => 2,
             'en_attente_paiement' => 3,
-            'valide'              => 4,
+            'validé'              => 4,
             default               => 1,
         };
     }

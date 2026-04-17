@@ -80,7 +80,7 @@ class DeclarationFactory extends Factory
     public function valide(): static
     {
         return $this->state(fn () => [
-            'statut'                => 'valide',
+            'statut'                => 'validé',
             'phase'                 => 4,
             'submitted_at'          => now()->subDays(rand(8, 15)),
             'validated_at'          => now()->subDays(rand(4, 7)),
@@ -94,7 +94,7 @@ class DeclarationFactory extends Factory
     public function rejete(): static
     {
         return $this->state(fn () => [
-            'statut'       => 'rejete',
+            'statut'       => 'rejeté',
             'phase'        => 2,
             'submitted_at' => now()->subDays(rand(3, 10)),
             'processed_at' => now()->subDays(rand(1, 3)),

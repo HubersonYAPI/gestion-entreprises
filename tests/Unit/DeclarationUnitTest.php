@@ -53,8 +53,8 @@ test('les statuts du projet sont bien définis et au nombre attendu', function (
         'brouillon',
         'soumis',
         'en_traitement',
-        'valide',
-        'rejete',
+        'validé',
+        'rejeté',
         'non_paye',
         'finalise',
     ];

@@ -254,6 +254,17 @@ tbody tr:hover td   { background: #f8f9fd; }
 .bv:hover   { background: #d1fae5; }
 .bv svg     { width: 12px; height: 12px; }
 
+/* Bouton Mettre en Traitement inline (avec label) */
+.bm {
+    display: inline-flex; align-items: center; gap: .3rem;
+    font-size: .71rem; font-weight: 700;
+    padding: .28rem .65rem; border-radius: 6px;
+    border: 1px solid #bfdbfe; background: #eff6ff; color: #2563eb;
+    cursor: pointer; transition: all .15s;
+}
+.bm:hover   { background: #eaedfa; }
+.bm svg     { width: 12px; height: 12px; }
+
 /* Groupe d'actions */
 .acts { display: flex; align-items: center; gap: .35rem; }
 

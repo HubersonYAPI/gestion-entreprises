@@ -16,7 +16,7 @@
 
     {{-- Statut banner --}}
     @php
-        $sMap = ['brouillon'=>['Brouillon','ub-gray','#f1f5f9','#475569'],'soumis'=>['Soumis','ub-blue','#dbeafe','#1d4ed8'],'en_traitement'=>['En traitement','ub-yellow','#fef9c3','#92400e'],'valide'=>['Validée','ub-green','#d1fae5','#065f46'],'rejete'=>['Rejetée','ub-red','#fee2e2','#991b1b']];
+        $sMap = ['brouillon'=>['Brouillon','ub-gray','#f1f5f9','#475569'],'soumis'=>['Soumis','ub-blue','#dbeafe','#1d4ed8'],'en_traitement'=>['En traitement','ub-yellow','#fef9c3','#92400e'],'validé'=>['Validée','ub-green','#d1fae5','#065f46'],'rejeté'=>['Rejetée','ub-red','#fee2e2','#991b1b']];
         [$sl,$sc,$sbg,$stxt] = $sMap[$declaration->statut] ?? [ucfirst($declaration->statut),'ub-gray','#f1f5f9','#475569'];
     @endphp
     <div style="background:{{ $sbg }};border:1px solid {{ $sbg }};border-radius:10px;padding:.85rem 1.2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem">

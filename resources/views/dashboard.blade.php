@@ -4,16 +4,29 @@
 :root { --white:#fff; --bg:#f0f2f8; --accent:#2f54eb; --border:#e4e8f0; --t1:#111827; --t2:#4b5563; --t3:#9ca3af; --sh-sm:0 1px 3px rgba(0,0,0,.06); --sh:0 4px 16px rgba(0,0,0,.07); --r:10px; }
 
 /* Layout */
-.db { display:flex; flex-direction:column; gap:1.5rem; }
+.db {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
+    min-width: 0;       /* ← crucial */
+    overflow-x: hidden; /* ← bloque le scroll horizontal */
+    box-sizing: border-box;
+}
 
 /* Header */
-.db-hd  { display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:1rem; }
+.db-hd  { display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:1rem; width: 100%; }
 .db-title { font-size:1.3rem; font-weight:800; color:var(--t1); letter-spacing:-.02em; }
 .db-sub   { font-size:.79rem; color:var(--t3); margin-top:.15rem; }
 .db-date  { font-size:.75rem; color:var(--t2); background:var(--white); border:1px solid var(--border); padding:.35rem .8rem; border-radius:8px; box-shadow:var(--sh-sm); }
 
 /* Stat cards */
-.stats { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:1rem; }
+.stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1rem;
+    width: 100%;
+}
 .sc { background:var(--white); border:1px solid var(--border); border-radius:var(--r); padding:1.1rem 1.15rem; box-shadow:var(--sh-sm); display:flex; flex-direction:column; gap:.65rem; transition:box-shadow .2s,transform .2s; }
 .sc:hover { box-shadow:var(--sh); transform:translateY(-1px); }
 .sc-top  { display:flex; align-items:center; justify-content:space-between; }
@@ -29,20 +42,26 @@
 .ic-gray  {background:#f8fafc;color:#475569;}
 
 /* Filters */
-.filters { display:flex; align-items:center; gap:.45rem; flex-wrap:wrap; }
+.filters {
+    display: flex;
+    align-items: center;
+    gap: .45rem;
+    flex-wrap: wrap;
+    width: 100%;
+}
 .flt { font-size:.74rem; font-weight:600; padding:.32rem .8rem; border-radius:20px; border:1px solid var(--border); background:var(--white); color:var(--t2); cursor:pointer; text-decoration:none; transition:all .15s; white-space:nowrap; }
 .flt:hover { background:#eaedfa; color:var(--accent); border-color:#c7d0f5; }
 .flt.on { background:var(--accent); color:#fff; border-color:var(--accent); }
 
 /* Card */
-.card { background:var(--white); border:1px solid var(--border); border-radius:var(--r); box-shadow:var(--sh-sm); overflow:hidden; }
+.card { background:var(--white); border:1px solid var(--border); border-radius:var(--r); box-shadow:var(--sh-sm); overflow:hidden; width: 100%; min-width: 0; box-sizing: border-box}
 .ch   { display:flex; align-items:center; justify-content:space-between; padding:.9rem 1.2rem; border-bottom:1px solid var(--border); }
 .ct   { font-size:.85rem; font-weight:700; color:var(--t1); }
 .cc   { font-size:.7rem; font-weight:700; background:#eff2ff; color:var(--accent); padding:2px 8px; border-radius:20px; }
 
 /* Table */
-.tw   { overflow-x:auto; }
-table { width:100%; border-collapse:collapse; font-size:.79rem; }
+.tw   { overflow-x:auto; width: 100%;}
+table { width:100%; min-width: 600px; border-collapse:collapse; font-size:.79rem; }
 th    { text-align:left; padding:.55rem 1.1rem; font-size:.63rem; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--t3); background:#f8f9fd; border-bottom:1px solid var(--border); white-space:nowrap; }
 td    { padding:.72rem 1.1rem; color:var(--t2); border-bottom:1px solid var(--border); vertical-align:middle; }
 tr:last-child td { border-bottom:none; }
@@ -90,7 +109,7 @@ tbody tr:hover td { background:#f8f9fd; }
 .pager .page-item.disabled .page-link { opacity:.4; pointer-events:none; }
 </style>
 
-<div class="db">
+<div class="db" style="width:100%;overflow-x:hidden;">
 
     {{-- ── Header ── --}}
     <div class="db-hd">
@@ -299,6 +318,18 @@ tbody tr:hover td { background:#f8f9fd; }
                                     {{-- Voir documents si rejeté --}}
                                     <a href="{{ route('documents.index', $decl) }}" class="bi bi-doc" title="Documents">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8"/></svg>
+                                    </a>
+
+                                @elseif($decl->statut === 'terminé' && !empty($decl->attestation?->file_path))
+                                    <a href="{{ asset('storage/'.$decl->attestation->file_path) }}" 
+                                    target="_blank" 
+                                    class="bv">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                        <path d="M12 3v12"></path>
+                                        <polyline points="7 10 12 15 17 10"></polyline>
+                                        <path d="M5 21h14"></path>
+                                    </svg>
+                                        Attestation
                                     </a>
                                 @endif
                             </div>
