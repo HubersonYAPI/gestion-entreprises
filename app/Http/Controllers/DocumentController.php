@@ -6,6 +6,7 @@ use App\Models\Declaration;
 use App\Models\Document;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class DocumentController extends Controller
 {
@@ -53,6 +54,13 @@ class DocumentController extends Controller
 
     public function destroy(Document $document)
     {
+        $user = Auth::user();
+
+        // Vérification d'accès (IMPORTANT)
+        if ($document->declaration->entreprise->gerant_id !== $user->gerant->id) {
+            abort(403);
+        }
+
         // Supprimer le fichier du storage
         if ($document->file_path && Storage::disk('public')->exists($document->file_path)) {
             Storage::disk('public')->delete($document->file_path);

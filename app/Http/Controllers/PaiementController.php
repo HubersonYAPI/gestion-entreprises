@@ -54,7 +54,7 @@ class PaiementController extends Controller
 
         //Actualiser statut déclaration
         $declaration->update([
-            'statut' => 'payé',
+            'statut' => 'validé',
             'phase' => 4,
             'paid_at' =>now(),
         ]);

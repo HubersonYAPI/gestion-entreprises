@@ -74,7 +74,7 @@ test('POST /paiement effectue un paiement avec succès', function () {
     // Déclaration mise à jour
     $this->assertDatabaseHas('declarations', [
         'id'     => $this->declaration->id,
-        'statut' => 'payé',
+        'statut' => 'validé',
         'phase'  => 4,
     ]);
 });

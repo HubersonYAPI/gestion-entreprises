@@ -101,7 +101,7 @@ class AgentController extends Controller
         $dateLimite = Carbon::now()->addHours(72);
 
         $declaration->update([
-            'statut' => 'validé',
+            'statut' => 'en_attente_paiement',
             'validated_at' => Carbon::now(),
             'date_limite_paiement' => $dateLimite,
             'phase' => 3,

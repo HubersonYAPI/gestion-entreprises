@@ -90,7 +90,7 @@ test('GET /agent/declarations/soumis ne retourne que les déclarations soumises'
     // Déclaration validée — ne doit PAS apparaître
     Declaration::factory()->create([
         'entreprise_id' => $this->entreprise->id,
-        'statut'        => 'valide',
+        'statut'        => 'en_attente_paiement',
         'phase'         => 3,
     ]);
 
@@ -223,7 +223,7 @@ test('POST /agent/declarations/{id}/valider valide la déclaration si tous les d
 
     $this->assertDatabaseHas('declarations', [
         'id'     => $this->declaration->id,
-        'statut' => 'validé',
+        'statut' => 'en_attente_paiement',
         'phase'  => 3,
     ]);
 });
