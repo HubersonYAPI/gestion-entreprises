@@ -4,11 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Declaration;
 use App\Models\Paiement;
+use App\Services\HistoriqueService;
+use App\Services\NotificationService;
+use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-
-use Carbon\Carbon;
 
 class PaiementController extends Controller
 {
@@ -43,21 +44,29 @@ class PaiementController extends Controller
             return back()->with('error', 'Paiement déjà effectué');
         }
 
+        $ancienStatut = $declaration->statut;
+
         //Créer paiement
         Paiement::create([
             'declaration_id' => $declaration->id,
             'montant' => 10000,
             'reference' => 'PAY-' . strtoupper(Str::random(8)),
-            'statut' => 'payé',
-            'date_paiement' => now(),
+            'statut' => 'paye',
+            'date_paiement' => Carbon::now(),
         ]);
 
         //Actualiser statut déclaration
+
+        $ancienStatut = $declaration->statut;
+
         $declaration->update([
-            'statut' => 'validé',
+            'statut' => 'en_traitement',
             'phase' => 4,
-            'paid_at' =>now(),
+            'paid_at' =>Carbon::now(),
         ]);
+
+        HistoriqueService::enregistrer($declaration, 'paye', request(), 'Paiement effectué par le gérant.', $ancienStatut);
+        NotificationService::notifier($declaration, 'paye');
 
         return redirect()->route('declarations.index')->with('success', 'Paiement effectué avec succès');
     }
@@ -68,7 +77,7 @@ class PaiementController extends Controller
     private function authorizeAccess($declaration)
     {
         if ($declaration->entreprise->gerant_id !== Auth::user()->gerant->id) {
-            abort(403);
+            abort(403, 'Accès non autorisé.');
         }
     }
 }

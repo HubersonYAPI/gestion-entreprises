@@ -93,7 +93,7 @@
                 <div class="sc-ico ic-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
                 <span class="sc-badge up">✓</span>
             </div>
-            <div class="sc-val">{{ $stats['validé'] }}</div>
+            <div class="sc-val">{{ $stats['valide'] }}</div>
             <div class="sc-lbl">Validées</div>
         </div>
         <div class="sc">
@@ -101,7 +101,7 @@
                 <div class="sc-ico ic-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div>
                 <span class="sc-badge dn">✗</span>
             </div>
-            <div class="sc-val">{{ $stats['rejeté'] }}</div>
+            <div class="sc-val">{{ $stats['rejete'] }}</div>
             <div class="sc-lbl">Rejetées</div>
         </div>
     </div>
@@ -139,7 +139,7 @@
                 <tbody>
                 @forelse($declarations as $decl)
                     @php
-                        $sm = ['soumis'=>['Soumis','b-soumis'],'non_paye'=>['Non payé','b-np'],'en_traitement'=>['En traitement','b-trait'],'validé'=>['Validée','b-valid'],'rejeté'=>['Rejetée','b-rej']];
+                        $sm = ['soumis'=>['Soumis','b-soumis'],'non_paye'=>['Non payé','b-np'],'en_traitement'=>['En traitement','b-trait'],'valide'=>['Validée','b-valid'],'rejete'=>['Rejetée','b-rej']];
                         [$sl,$sc] = $sm[$decl->statut] ?? [ucfirst($decl->statut),'b-def'];
                     @endphp
                     <tr>
@@ -173,7 +173,7 @@
                                 @endif
 
                                 {{-- Passer en traitement --}}
-                                @if($decl->statut === 'validé')
+                                @if($decl->statut === 'valide')
                                 <form method="POST" action="{{ route('agent.traiter', $decl) }}">
                                     @csrf
                                     <button type="submit" class="bm" title="Valider">

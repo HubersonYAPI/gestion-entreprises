@@ -4,14 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\Declaration;
 use App\Models\Document;
-use Illuminate\Http\Request;
+use App\Services\HistoriqueService;
+use App\Services\NotificationService;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AgentController extends Controller
 {
     public function dashboard(Request $request)
     {
-        $query = Declaration::where('phase', '>', 1);
+        $query = Declaration::with(['entreprise', 'entreprise.gerant'])
+            ->where('phase', '>', 1);
 
         // Détection du filtre via la route
         if ($request->routeIs('agent.declarations.soumis')) {
@@ -27,11 +31,11 @@ class AgentController extends Controller
         }
 
         if ($request->routeIs('agent.declarations.valider')) {
-            $query->where('statut', 'validé');
+            $query->where('statut', 'valide');
         }
 
         if ($request->routeIs('agent.declarations.rejeter')) {
-            $query->where('statut', 'rejeté');
+            $query->where('statut', 'rejete');
         }
 
         $declarations = $query->latest('updated_at')->paginate(10);
@@ -42,8 +46,8 @@ class AgentController extends Controller
             'soumis' => Declaration::where('statut', 'soumis')->count(),
             'non_paye' => Declaration::where('statut', 'non_paye')->count(),
             'en_traitement' => Declaration::where('statut', 'en_traitement')->count(),
-            'validé' => Declaration::where('statut', 'validé')->count(),
-            'rejeté' => Declaration::where('statut', 'rejeté')->count(),
+            'valide' => Declaration::where('statut', 'valide')->count(),
+            'rejete' => Declaration::where('statut', 'rejete')->count(),
         ];
 
         return view('agent.dashboard', compact('declarations',  'stats'));
@@ -51,9 +55,20 @@ class AgentController extends Controller
 
     public function show(Declaration $declaration)
     {
-        $documents = $declaration->documents;
+        $declaration->load(['documents', 'entreprise.gerant', 'historiques.user']);
+ 
+        return view('agent.show', compact('declaration'));
+    }
 
-        return view('agent.show', compact('declaration', 'documents'));
+    /**
+     * Historique d'une déclaration
+     * Route : GET /agent/declarations/{declaration}/historique
+     */
+    public function historique(Declaration $declaration)
+    {
+        $declaration->load(['historiques.user', 'entreprise.gerant']);
+ 
+        return view('agent.historique', compact('declaration'));
     }
 
     /**
@@ -62,7 +77,7 @@ class AgentController extends Controller
     public function validerDocument(Document $document)
     {
         $document->update([
-            'statut' => 'validé',
+            'statut' => 'valide',
         ]);
         return back()->with('success', $document->type . ' validé');
     }
@@ -73,7 +88,7 @@ class AgentController extends Controller
     public function rejeterDocument(Document $document)
     {
         $document->update([
-            'statut' => 'rejeté',
+            'statut' => 'rejete',
         ]);
 
         return back()->with('error', $document->type . ' rejeté');
@@ -87,7 +102,7 @@ class AgentController extends Controller
         $documents = $declaration->documents;
 
         // Vérifier documents non validés
-        $invalides = $documents->where('statut', '!=', 'validé');
+        $invalides = $documents->where('statut', '!=', 'valide');
 
         if ($invalides->count() > 0) {
             $liste = $invalides->map(function ($document) {
@@ -96,6 +111,8 @@ class AgentController extends Controller
 
             return back()->with('error', 'Impossible de valider. Documents non conformes : ' . $liste);
         }
+
+        $ancienStatut = $declaration->statut;
         
         // Tout est OK
         $dateLimite = Carbon::now()->addHours(72);
@@ -108,7 +125,11 @@ class AgentController extends Controller
 
         ]);
 
-        return redirect()->route('agent.dashboard')->with('success', 'Declaration validée avec succès');
+        // Historique + Notification
+        HistoriqueService::enregistrer($declaration, 'approuve', request(), 'Tous les documents sont conformes.', $ancienStatut);
+        NotificationService::notifier($declaration, 'approuve');
+
+        return redirect()->route('agent.dashboard')->with('success', 'Declaration approuvée avec succès');
     }
 
     /**
@@ -120,13 +141,16 @@ class AgentController extends Controller
             'commentaire' => 'required',
         ]);
 
-        
+        $ancienStatut = $declaration->statut;
+
         $declaration->update([
-            'statut' => 'rejeté',
-            'phase' => 5,
-            //Ajouter un champ commentaire dans la table Declaration
-            //'commentaire' => $request->commentaire,
+            'statut' => 'rejete',
+            'commentaire' => $request->commentaire,
         ]);
+
+        // Historique + Notification
+        HistoriqueService::enregistrer($declaration, 'rejete', $request, $request->commentaire, $ancienStatut);
+        NotificationService::notifier($declaration, 'rejete', $request->commentaire);
         
         /**
          * Mise à jour des commentaire de chaque document
@@ -144,6 +168,7 @@ class AgentController extends Controller
 
     public function documents(Declaration $declaration)
     {
+        $declaration->load(['documents', 'entreprise']);
         $documents = $declaration->documents;
 
         return view('agent.documents', compact('declaration', 'documents'));

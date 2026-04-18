@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Document;
 use App\Models\Paiement;
 use App\Models\Attestation;
+use App\Models\DeclarationHistorique;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -17,6 +18,7 @@ class Declaration extends Model
         'reference',
         'statut',
         'phase',
+        'commentaire',        // ← motif de rejet
         'nature_activite',
         'secteur_activite',
         'produits',
@@ -61,5 +63,10 @@ class Declaration extends Model
     public function attestation()
     {
         return $this->hasOne(Attestation::class);
+    }
+
+    public function historiques()
+    {
+        return $this->hasMany(DeclarationHistorique::class)->with('user')->latest();
     }
 }

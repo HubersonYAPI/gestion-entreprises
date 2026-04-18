@@ -8,6 +8,7 @@ use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\AgentController;
 use App\Http\Controllers\PaiementController;
 use App\Http\Controllers\TraitementController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Declaration;
 use App\Models\Gerant;
@@ -48,6 +49,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/paiement/{declaration}', [PaiementController::class, 'show'])->name('paiement.show');
 
     Route::post('/paiement/{declaration}', [PaiementController::class, 'payer'])->name('paiement.payer');
+
+
+    // Notifications
+    Route::prefix('notifications')->name('notifications.')->group(function () {
+        Route::get('/', [NotificationController::class, 'index'])->name('index');
+        Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('markAllAsRead');
+        Route::get('/{id}/read', [NotificationController::class, 'markAsRead'])->name('markAsRead');
+        Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('destroy');
+    });
 });
 
 
@@ -97,10 +107,13 @@ Route::prefix('agent')
     Route::get('/admin/roles',        [AgentController::class, 'dashboard'])->name('admin.roles');
     Route::get('/admin/logs',         [AgentController::class, 'dashboard'])->name('admin.logs');
 
-    Route::post('/declarations/{declaration}/traiter', [TraitementController::class, 'traiter'])
-    ->name('traiter');
-    Route::post('/declarations/{declaration}/terminer', [TraitementController::class, 'terminer'])
-    ->name('terminer');
+    // Traitement + finaliser  declaration
+    Route::post('/declarations/{declaration}/traiter', [TraitementController::class, 'traiter'])->name('traiter');
+    Route::post('/declarations/{declaration}/terminer', [TraitementController::class, 'terminer'])->name('terminer');
+
+    // Historique d'une déclaration (espace agent)
+    Route::get('/declarations/{declaration}/historique', [AgentController::class, 'historique'])->name('declarations.historique');
+    
 });
  
 

@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Declaration;
 use App\Models\Entreprise;
+use App\Services\HistoriqueService;
+use App\Services\NotificationService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -64,10 +67,10 @@ class DeclarationController extends Controller
     private function generateReference()
     {
         $prefix = 'DECL';
-        $date = now()->format('ym');
+        $date = Carbon::now()->format('ym');
 
-        $count = Declaration::whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year)
+        $count = Declaration::whereMonth('created_at', Carbon::now()->month)
+            ->whereYear('created_at', Carbon::now()->year)
             ->count() + 1;
 
         $numero = str_pad($count, 4, '0', STR_PAD_LEFT);
@@ -93,7 +96,7 @@ class DeclarationController extends Controller
         //securité
         $entreprise = $gerant->entreprises()->findOrFail($request->entreprise_id);
 
-        $entreprise->declarations()->create([
+        $declaration = $entreprise->declarations()->create([
             'reference' => $this->generateReference(),
             'statut' => 'brouillon',
             'phase' => 1,
@@ -102,6 +105,8 @@ class DeclarationController extends Controller
             'produits' => $request->produits,
             'effectifs' => $request->effectifs,
         ]);
+
+        HistoriqueService::enregistrer($declaration, 'creation', $request,'Déclaration créée par le gérant.', null);
 
         return redirect()->route('declarations.index')->with('success', 'Déclaration créée');
     }
@@ -137,20 +142,24 @@ class DeclarationController extends Controller
         $this->authorizeAccess($declaration);
 
         $request->validate([
-            'entreprise_id' => 'required',
-            'nature_activite' => 'required',
+            'entreprise_id'    => 'required',
+            'nature_activite'  => 'required',
             'secteur_activite' => 'required',
-            'produits' => 'required',
-            'effectifs' => 'required|integer',
+            'produits'         => 'required',
+            'effectifs'        => 'required|integer',
         ]);
 
+        $ancienStatut = $declaration->statut;
+
         $declaration->update([
-            'entreprise_id' => $request->entreprise_id,
-            'nature_activite' => $request->nature_activite,
+            'entreprise_id'    => $request->entreprise_id,
+            'nature_activite'  => $request->nature_activite,
             'secteur_activite' => $request->secteur_activite,
-            'produits' => $request->produits,
-            'effectifs' => $request->effectifs,
+            'produits'         => $request->produits,
+            'effectifs'        => $request->effectifs,
         ]);
+
+        HistoriqueService::enregistrer($declaration, 'modification', $request, 'Informations modifiées par le gérant.', $ancienStatut);
 
         return redirect()->route('declarations.index')->with('success', 'Déclaration mise à jour');
     }
@@ -193,21 +202,24 @@ class DeclarationController extends Controller
                 return $type . ' (non ajouté)';
             })->implode(', ');
 
-            return back()->with(
-                'error',
-                'Impossible de soumettre. Documents manquants : ' . $liste
+            return back()->with('error', 'Impossible de soumettre. Documents manquants : ' . $liste
             );
         }
 
         // ✅ OK → soumission
 
+        $ancienStatut = $declaration->statut;
+
         $declaration->update([
             'statut' => 'soumis',
-            'submitted_at' => now(),
+            'submitted_at' => Carbon::now(),
             'phase' => 2,
         ]);
 
-        return back()->with('success', 'Declaration Soumise');
+        HistoriqueService::enregistrer($declaration, 'soumis', request(), 'Déclaration soumise par le gérant.', $ancienStatut);
+        NotificationService::notifier($declaration, 'soumis');
+
+        return back()->with('success', 'Declaration Soumise avec succès.');
     }
 
     /**
@@ -216,7 +228,7 @@ class DeclarationController extends Controller
     private function authorizeAccess($declaration)
     {
         if ($declaration->entreprise->gerant_id !== Auth::user()->gerant->id) {
-            abort(403);
+            abort(403, 'Accès non autorisé.');
         }
     }
 }

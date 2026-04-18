@@ -155,9 +155,9 @@
                 <tr>
                     <td style="font-weight:600;color:var(--t1)">{{ $doc->type }}</td>
                     <td>
-                        @if($doc->statut === 'validé')
+                        @if($doc->statut === 'valide')
                             <span class="ds-v">Validé</span>
-                        @elseif($doc->statut === 'rejeté')
+                        @elseif($doc->statut === 'rejete')
                             <span class="ds-r">Rejeté</span>
                         @else
                             <span class="ds-p">En attente</span>
@@ -227,6 +227,8 @@
             @endif
         </div>
     </div>
+
+    @include('agent.partials.historique', ['historiques' => $declaration->historiques])
 
 </div>
 

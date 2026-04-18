@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\Declaration;
+use Carbon\Carbon;
 
 class CheckPaiementExpiration extends Command
 {
@@ -27,9 +28,9 @@ class CheckPaiementExpiration extends Command
      */
     public function handle()
     {
-        Declaration::where('statut', 'validé')
+        Declaration::where('statut', 'valide')
             ->whereNotNull('date_limite_paiement')
-            ->where('date_limite_paiement', '<', now())
+            ->where('date_limite_paiement', '<', Carbon::now())
             ->update(['statut' => 'expiré']);
 
         $this->info('Paiements expirés mis à jour');

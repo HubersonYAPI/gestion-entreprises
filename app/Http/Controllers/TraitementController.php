@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Declaration;
 use App\Models\Attestation;
+use App\Services\HistoriqueService;
+use App\Services\NotificationService;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -19,11 +21,15 @@ class TraitementController extends Controller
      */
     public function traiter(Declaration $declaration)
     {
+        $ancienStatut = $declaration->statut;
+
         $declaration->update([
             'statut' => 'en_traitement',
-            'phase' => 5,
             'processed_at' => Carbon::now()
         ]);
+
+        HistoriqueService::enregistrer($declaration, 'en_traitement', request(), 'Dossier pris en charge par l\'équipe.', $ancienStatut);
+        NotificationService::notifier($declaration, 'en_traitement');
 
         return back()->with('success', 'Déclaration mise en traitement');
     }
@@ -53,12 +59,17 @@ class TraitementController extends Controller
             'reference' => 'ATT-' .strtoupper(Str::random(8)),
         ]);
 
+        $ancienStatut = $declaration->statut;
+
         // MAJ déclaration
         $declaration->update([
-            'statut' => 'terminé',
-            'phase' => 6,
+            'statut' => 'valide',
+            'phase' => 5,
             'completed_at' => now(),
         ]);
+
+        HistoriqueService::enregistrer($declaration, 'valide', request(), null, $ancienStatut);
+        NotificationService::notifier($declaration, 'valide');
 
         return back()->with('success', 'Déclaration terminée + attestation générée');
     }
