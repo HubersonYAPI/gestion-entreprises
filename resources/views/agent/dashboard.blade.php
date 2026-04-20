@@ -110,7 +110,8 @@
     <div class="filters">
         <a href="{{ route('agent.dashboard') }}" class="flt {{ request()->routeIs('agent.dashboard') ? 'on':'' }}">Toutes</a>
         <a href="{{ route('agent.declarations.soumis') }}" class="flt {{ request()->routeIs('agent.declarations.soumis') ? 'on':'' }}">Soumises</a>
-        <a href="{{ route('agent.declarations.non-paye') }}" class="flt {{ request()->routeIs('agent.declarations.non-paye') ? 'on':'' }}">Non payées</a>
+        <a href="{{ route('agent.declarations.approuver') }}" class="flt {{ request()->routeIs('agent.declarations.approuver') ? 'on':'' }}">Approuvées</a>
+        <a href="{{ route('agent.declarations.payer') }}" class="flt {{ request()->routeIs('agent.declarations.payer') ? 'on':'' }}">Soldées</a>
         <a href="{{ route('agent.declarations.en-traitement') }}" class="flt {{ request()->routeIs('agent.declarations.en-traitement') ? 'on':'' }}">En traitement</a>
         <a href="{{ route('agent.declarations.valider') }}" class="flt {{ request()->routeIs('agent.declarations.valider') ? 'on':'' }}">Validées</a>
         <a href="{{ route('agent.declarations.rejeter') }}" class="flt {{ request()->routeIs('agent.declarations.rejeter') ? 'on':'' }}">Rejetées</a>
@@ -139,7 +140,7 @@
                 <tbody>
                 @forelse($declarations as $decl)
                     @php
-                        $sm = ['soumis'=>['Soumis','b-soumis'],'non_paye'=>['Non payé','b-np'],'en_traitement'=>['En traitement','b-trait'],'valide'=>['Validée','b-valid'],'rejete'=>['Rejetée','b-rej']];
+                        $sm = ['soumis'=>['Soumis','b-soumis'],'approuve'=>['Approuvées','b-np'],'paye'=>['Soldées','b-np'],'en_traitement'=>['En traitement','b-trait'],'valide'=>['Validée','b-valid'],'rejete'=>['Rejetée','b-rej']];
                         [$sl,$sc] = $sm[$decl->statut] ?? [ucfirst($decl->statut),'b-def'];
                     @endphp
                     <tr>

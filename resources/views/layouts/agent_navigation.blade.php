@@ -177,11 +177,11 @@
             border-radius: 50%;
             flex-shrink: 0;
         }
-        .dot-yellow  { background: #eab308; }
+        .dot-yellow  { background: #f59e0b; }
         .dot-red     { background: #ef4444; }
         .dot-blue    { background: #3b82f6; }
-        .dot-green   { background: #22c55e; }
-        .dot-gray    { background: #64748b; }
+        .dot-green   { background: #10b981; }
+        .dot-gray    { background: #6b7280; }
         .dot-orange  { background: #f97316; }
         .dot-purple  { background: #a855f7; }
         .dot-indigo  { background: #6366f1; }
@@ -388,20 +388,26 @@
                 </button>
                 <div class="nav-dropdown" :class="{ 'open': activeMenu === 'declarations' }">
                     <div class="dropdown-label">Par statut</div>
-                    <a href="{{ route('agent.declarations.soumis') }}" class="dropdown-link {{ request()->routeIs('agent.declarations.soumis') ? 'active' : '' }}">
-                        <span class="dropdown-dot dot-blue"></span> Soumis
+                    <a href="{{ route('agent.dashboard') }}" class="dropdown-link {{ request()->routeIs('agent.dashboard') ? 'active' : '' }}">
+                        <span class="dropdown-dot dot-gray"></span> Toutes
                     </a>
-                    <a href="{{ route('agent.declarations.non-paye') }}" class="dropdown-link {{ request()->routeIs('agent.declarations.non-paye') ? 'active' : '' }}">
-                        <span class="dropdown-dot dot-red"></span> Non Payé
+                    <a href="{{ route('agent.declarations.soumis') }}" class="dropdown-link {{ request()->routeIs('agent.declarations.soumis') ? 'active' : '' }}">
+                        <span class="dropdown-dot dot-blue"></span> Soumises
+                    </a>
+                    <a href="{{ route('agent.declarations.approuver') }}" class="dropdown-link {{ request()->routeIs('agent.declarations.approuver') ? 'active' : '' }}">
+                        <span class="dropdown-dot dot-green"></span> Approuvées
+                    </a>
+                    <a href="{{ route('agent.declarations.payer') }}" class="dropdown-link {{ request()->routeIs('agent.declarations.payer') ? 'active' : '' }}">
+                        <span class="dropdown-dot dot-teal"></span> Soldées
                     </a>
                     <a href="{{ route('agent.declarations.en-traitement') }}" class="dropdown-link {{ request()->routeIs('agent.declarations.en-traitement') ? 'active' : '' }}">
                         <span class="dropdown-dot dot-yellow"></span> En Traitement
                     </a>
                     <a href="{{ route('agent.declarations.valider') }}" class="dropdown-link {{ request()->routeIs('agent.declarations.valider') ? 'active' : '' }}">
-                        <span class="dropdown-dot dot-green"></span> Validées
+                        <span class="dropdown-dot dot-purple"></span> Validées
                     </a>
                     <a href="{{ route('agent.declarations.rejeter') }}" class="dropdown-link {{ request()->routeIs('agent.declarations.rejeter') ? 'active' : '' }}">
-                        <span class="dropdown-dot dot-gray"></span> Rejetées
+                        <span class="dropdown-dot dot-red"></span> Rejetées
                     </a>
                 </div>
             </div>
@@ -421,13 +427,13 @@
                     </svg>
                 </button>
                 <div class="nav-dropdown" :class="{ 'open': activeMenu === 'entreprises' }">
-                    <a href="{{ route('agent.entreprises.index') }}" class="dropdown-link {{ request()->routeIs('agent.entreprises.index') ? 'active' : '' }}">
+                    <a href="{{ route('agent.entreprises') }}" class="dropdown-link {{ request()->routeIs('agent.entreprises') ? 'active' : '' }}">
                         <svg style="width:14px;height:14px;opacity:.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/>
                         </svg>
                         Entreprises
                     </a>
-                    <a href="{{ route('agent.gerants.index') }}" class="dropdown-link {{ request()->routeIs('agent.gerants.*') ? 'active' : '' }}">
+                    <a href="{{ route('agent.gerants') }}" class="dropdown-link {{ request()->routeIs('agent.gerants.*') ? 'active' : '' }}">
                         <svg style="width:14px;height:14px;opacity:.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
                         </svg>
@@ -437,26 +443,15 @@
             </div>
 
             {{-- Attestations --}}
-            <div class="nav-item" @click.away="activeMenu = activeMenu === 'attestations' ? null : activeMenu">
-                <button @click="toggleMenu('attestations')"
-                        :class="{ 'active': {{ request()->routeIs('agent.attestations.*') ? 'true' : 'false' }}, 'dropdown-open': activeMenu === 'attestations' }"
-                        class="nav-link {{ request()->routeIs('agent.attestations.*') ? 'active' : '' }}">
-                    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>
+            <div> 
+                <a href="{{ route('agent.attestations') }}"
+                class="sb-link {{ request()->routeIs('agent.attestations.*') ? 'act':'' }}">
+                    <svg class="sb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="8" r="6"/>
+                        <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>
                     </svg>
-                    Attestations
-                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                        <path d="M6 9l6 6 6-6"/>
-                    </svg>
-                </button>
-                <div class="nav-dropdown" :class="{ 'open': activeMenu === 'attestations' }">
-                    <a href="{{ route('agent.attestations.en-cours') }}" class="dropdown-link {{ request()->routeIs('agent.attestations.en-cours') ? 'active' : '' }}">
-                        <span class="dropdown-dot dot-orange"></span> En Cours
-                    </a>
-                    <a href="{{ route('agent.attestations.index') }}" class="dropdown-link {{ request()->routeIs('agent.attestations.index') ? 'active' : '' }}">
-                        <span class="dropdown-dot dot-teal"></span> Toutes
-                    </a>
-                </div>
+                    <span class="sb-lbl">Attestations</span>
+                </a>
             </div>
 
             {{-- Analyses --}}
@@ -607,10 +602,11 @@
             </button>
             <div class="mobile-sub" :class="{ 'open': activeMenu === 'm-decl' }">
                 <a href="{{ route('agent.declarations.soumis') }}" class="mobile-sub-link"><span class="dropdown-dot dot-blue"></span> Soumis</a>
-                <a href="{{ route('agent.declarations.non-paye') }}" class="mobile-sub-link"><span class="dropdown-dot dot-red"></span> Non Payé</a>
+                <a href="{{ route('agent.declarations.approuver') }}" class="mobile-sub-link"><span class="dropdown-dot dot-green"></span> Approuvées</a>
+                <a href="{{ route('agent.declarations.payer') }}" class="mobile-sub-link"><span class="dropdown-dot dot-teal"></span> Soldées</a>
                 <a href="{{ route('agent.declarations.en-traitement') }}" class="mobile-sub-link"><span class="dropdown-dot dot-yellow"></span> En Traitement</a>
-                <a href="{{ route('agent.declarations.valider') }}" class="mobile-sub-link"><span class="dropdown-dot dot-green"></span> Validées</a>
-                <a href="{{ route('agent.declarations.rejeter') }}" class="mobile-sub-link"><span class="dropdown-dot dot-gray"></span> Rejetées</a>
+                <a href="{{ route('agent.declarations.valider') }}" class="mobile-sub-link"><span class="dropdown-dot dot-purple"></span> Validées</a>
+                <a href="{{ route('agent.declarations.rejeter') }}" class="mobile-sub-link"><span class="dropdown-dot dot-red"></span> Rejetées</a>
             </div>
 
             {{-- Mobile Entreprises --}}
@@ -622,22 +618,15 @@
                 <svg style="width:12px;height:12px;transition:transform .2s" :style="activeMenu === 'm-entr' ? 'transform:rotate(180deg)' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
             </button>
             <div class="mobile-sub" :class="{ 'open': activeMenu === 'm-entr' }">
-                <a href="{{ route('agent.entreprises.index') }}" class="mobile-sub-link">Entreprises</a>
-                <a href="{{ route('agent.gerants.index') }}" class="mobile-sub-link">Gérants</a>
+                <a href="{{ route('agent.entreprises') }}" class="mobile-sub-link">Entreprises</a>
+                <a href="{{ route('agent.gerants') }}" class="mobile-sub-link">Gérants</a>
             </div>
 
             {{-- Mobile Attestations --}}
-            <button @click="toggleMenu('m-attest')" class="mobile-link" style="justify-content:space-between">
-                <span style="display:flex;align-items:center;gap:.6rem">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
-                    Attestations
-                </span>
-                <svg style="width:12px;height:12px;transition:transform .2s" :style="activeMenu === 'm-attest' ? 'transform:rotate(180deg)' : ''" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
-            </button>
-            <div class="mobile-sub" :class="{ 'open': activeMenu === 'm-attest' }">
-                <a href="{{ route('agent.attestations.en-cours') }}" class="mobile-sub-link"><span class="dropdown-dot dot-orange"></span> En Cours</a>
-                <a href="{{ route('agent.attestations.index') }}" class="mobile-sub-link"><span class="dropdown-dot dot-teal"></span> Toutes</a>
-            </div>
+            <a href="{{ route('agent.attestations') }}" class="mobile-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+                Attestations
+            </a>
 
             {{-- Mobile Analyses --}}
             <button @click="toggleMenu('m-anal')" class="mobile-link" style="justify-content:space-between">

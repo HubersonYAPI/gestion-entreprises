@@ -43,8 +43,7 @@ class DocumentController extends Controller
         $filePath = $request->file('file')->store('documents', 'public');
 
         // Enregistrement
-        Document::create([
-            'declaration_id' => $declaration->id,
+        $declaration->documents()->create([
             'type' => $request->type,
             'file_path' => $filePath,
         ]);

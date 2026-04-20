@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Declaration;
 use App\Models\Document;
+use App\Models\Entreprise;
+use App\Models\Gerant;
 use App\Services\HistoriqueService;
 use App\Services\NotificationService;
 use Carbon\Carbon;
@@ -22,8 +24,12 @@ class AgentController extends Controller
             $query->where('statut', 'soumis');
         }
 
-        if ($request->routeIs('agent.declarations.non-paye')) {
-            $query->where('statut', 'non_paye');
+        if ($request->routeIs('agent.declarations.approuver')) {
+            $query->where('statut', 'approuve');
+        }
+
+        if ($request->routeIs('agent.declarations.payer')) {
+            $query->where('statut', 'paye');
         }
 
         if ($request->routeIs('agent.declarations.en-traitement')) {
@@ -42,12 +48,13 @@ class AgentController extends Controller
 
         // Statistiques pour le dashboard
         $stats = [
-            'total' => Declaration::where('phase', '>', 1)->count(),
-            'soumis' => Declaration::where('statut', 'soumis')->count(),
-            'non_paye' => Declaration::where('statut', 'non_paye')->count(),
+            'total'         => Declaration::where('phase', '>', 1)->count(),
+            'soumis'        => Declaration::where('statut', 'soumis')->count(),
+            'approuve'      => Declaration::where('statut', 'approuve')->count(),
+            'paye'          => Declaration::where('statut', 'paye')->count(),
             'en_traitement' => Declaration::where('statut', 'en_traitement')->count(),
-            'valide' => Declaration::where('statut', 'valide')->count(),
-            'rejete' => Declaration::where('statut', 'rejete')->count(),
+            'valide'        => Declaration::where('statut', 'valide')->count(),
+            'rejete'        => Declaration::where('statut', 'rejete')->count(),
         ];
 
         return view('agent.dashboard', compact('declarations',  'stats'));
@@ -79,6 +86,15 @@ class AgentController extends Controller
         $document->update([
             'statut' => 'valide',
         ]);
+
+        // Met à jour updated_at de la déclaration liée
+        $document->declaration->touch();
+
+        // Touch ou ce code
+        // $document->declaration->update([
+        //     'updated_at' => now()
+        // ]);
+
         return back()->with('success', $document->type . ' validé');
     }
 
@@ -90,6 +106,9 @@ class AgentController extends Controller
         $document->update([
             'statut' => 'rejete',
         ]);
+
+        // Met à jour updated_at de la déclaration liée
+        $document->declaration->touch();
 
         return back()->with('error', $document->type . ' rejeté');
     }
@@ -172,6 +191,46 @@ class AgentController extends Controller
         $documents = $declaration->documents;
 
         return view('agent.documents', compact('declaration', 'documents'));
+    }
+
+    /**
+     * Listes des entreprises
+     */
+    public function entreprises(Request $request)
+    {
+        $query = Entreprise::with('gerant');
+
+        if ($request->search) {
+            $query->where('nom', 'like', '%' . $request->search . '%');
+        }
+
+        $entreprises = $query->latest('updated_at')->paginate(10);
+
+        return view('agent.entreprises', compact('entreprises'));
+    }
+
+    /**
+     * Listes des Gerants
+     */
+    public function gerants(Request $request)
+    {
+        $query = Gerant::with('entreprises');
+
+        if ($request->search) {
+            $search = strtolower(trim($request->search));
+
+            $query->where(function ($q) use ($search) {
+                $q->whereRaw('LOWER(nom) LIKE ?', ["%$search%"])
+                ->orWhereRaw('LOWER(prenoms) LIKE ?', ["%$search%"])
+                ->orWhereRaw("LOWER(CONCAT(nom, ' ', prenoms)) LIKE ?", ["%$search%"]);
+            });
+        }
+
+        $gerants = $query->orderByDesc('id')
+                        ->paginate(10)
+                        ->withQueryString();
+
+        return view('agent.gerants', compact('gerants'));
     }
 }
 

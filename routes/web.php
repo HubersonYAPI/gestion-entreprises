@@ -9,6 +9,7 @@ use App\Http\Controllers\AgentController;
 use App\Http\Controllers\PaiementController;
 use App\Http\Controllers\TraitementController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\AttestationController;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Declaration;
 use App\Models\Gerant;
@@ -28,35 +29,37 @@ Route::get('/dashboard', [DeclarationController::class, 'dashboard'])
     ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/profile',    [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile',  [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::get('/gerant', [GerantController::class,'show'])->name('gerant.show');
-    Route::get('/profile-gerant', [GerantController::class, 'edit'])->name('gerant.edit');
+    Route::get('/gerant',          [GerantController::class,'show'])->name('gerant.show');
+    Route::get('/profile-gerant',  [GerantController::class, 'edit'])->name('gerant.edit');
     Route::post('/profile-gerant', [GerantController::class, 'update'])->name('gerant.update');
 
-    Route::resource('entreprises', EntrepriseController::class);
+    Route::resource('entreprises',  EntrepriseController::class);
     Route::resource('declarations', DeclarationController::class);
 
     //soumission declaration
-    Route::post('/declarations/{declaration}/submit', [DeclarationController::class, 'submit'])->name('declarations.submit');
+    Route::post('/declarations/{declaration}/submit',    [DeclarationController::class, 'submit'])->name('declarations.submit');
 
-    Route::get('/declarations/{declaration}/documents', [DocumentController::class, 'index'])->name('documents.index');
+    Route::get('/declarations/{declaration}/documents',  [DocumentController::class, 'index'])->name('documents.index');
     Route::post('/declarations/{declaration}/documents', [DocumentController::class, 'store'])->name('documents.store');
-    Route::delete('/documents/{document}', [DocumentController::class, 'destroy'])->name('documents.destroy');
+    Route::delete('/documents/{document}',               [DocumentController::class, 'destroy'])->name('documents.destroy');
 
-    Route::get('/paiement/{declaration}', [PaiementController::class, 'show'])->name('paiement.show');
+    Route::get('/paiement/{declaration}',                [PaiementController::class, 'show'])->name('paiement.show');
 
-    Route::post('/paiement/{declaration}', [PaiementController::class, 'payer'])->name('paiement.payer');
+    Route::post('/paiement/{declaration}',               [PaiementController::class, 'payer'])->name('paiement.payer');
+
+    Route::get('/attestations', [AttestationController::class, 'index'])->name('attestations.index');
 
 
     // Notifications
     Route::prefix('notifications')->name('notifications.')->group(function () {
-        Route::get('/', [NotificationController::class, 'index'])->name('index');
+        Route::get('/',               [NotificationController::class, 'index'])->name('index');
         Route::post('/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('markAllAsRead');
-        Route::get('/{id}/read', [NotificationController::class, 'markAsRead'])->name('markAsRead');
-        Route::delete('/{id}', [NotificationController::class, 'destroy'])->name('destroy');
+        Route::get('/{id}/read',      [NotificationController::class, 'markAsRead'])->name('markAsRead');
+        Route::delete('/{id}',        [NotificationController::class, 'destroy'])->name('destroy');
     });
 });
 
@@ -78,11 +81,13 @@ Route::prefix('agent')
     Route::post('/documents/{document}/rejeter', [AgentController::class, 'rejeterDocument'])->name('documents.rejeter');
  
     // ── Déclarations — statuts (routes FIXES en premier, avant {declaration}) ──
-    Route::get('/declarations/soumis',        [AgentController::class, 'dashboard'])->name('declarations.soumis');
-    Route::get('/declarations/non-paye',       [AgentController::class, 'dashboard'])->name('declarations.non-paye');
-    Route::get('/declarations/en-traitement',  [AgentController::class, 'dashboard'])->name('declarations.en-traitement');
-    Route::get('/declarations/valider-liste',  [AgentController::class, 'dashboard'])->name('declarations.valider');
-    Route::get('/declarations/rejeter-liste',  [AgentController::class, 'dashboard'])->name('declarations.rejeter');
+    Route::get('/declarations/toutes',           [AgentController::class, 'dashboard'])->name('declarations.toutes');
+    Route::get('/declarations/soumis',           [AgentController::class, 'dashboard'])->name('declarations.soumis');
+    Route::get('/declarations/approuve',         [AgentController::class, 'dashboard'])->name('declarations.approuver');
+    Route::get('/declarations/paye',             [AgentController::class, 'dashboard'])->name('declarations.payer');
+    Route::get('/declarations/en-traitement',    [AgentController::class, 'dashboard'])->name('declarations.en-traitement');
+    Route::get('/declarations/valider-liste',    [AgentController::class, 'dashboard'])->name('declarations.valider');
+    Route::get('/declarations/rejeter-liste',    [AgentController::class, 'dashboard'])->name('declarations.rejeter');
  
     // ── Déclarations — détail (route DYNAMIQUE après les fixes) ──
     Route::get('/declarations/{declaration}',           [AgentController::class, 'show'])->name('declarations.show');
@@ -91,12 +96,11 @@ Route::prefix('agent')
     Route::post('/declarations/{declaration}/rejeter',  [AgentController::class, 'rejeter'])->name('rejeter');
  
     // ── Entreprises ────────────────────────────────────────────
-    Route::get('/entreprises', [AgentController::class, 'dashboard'])->name('entreprises.index');
-    Route::get('/gerants',     [AgentController::class, 'dashboard'])->name('gerants.index');
+    Route::get('/entreprises', [AgentController::class, 'entreprises'])->name('entreprises');
+    Route::get('/gerants',     [AgentController::class, 'gerants'])->name('gerants');
  
-    // ── Attestations ───────────────────────────────────────────
-    Route::get('/attestations',          [AgentController::class, 'dashboard'])->name('attestations.index');
-    Route::get('/attestations/en-cours', [AgentController::class, 'dashboard'])->name('attestations.en-cours');
+    // Attestations
+    Route::get('/attestations',          [AttestationController::class, 'adminIndex'])->name('attestations');
  
     // ── Analyses ───────────────────────────────────────────────
     Route::get('/analyses/statistiques', [AgentController::class, 'dashboard'])->name('analyses.statistiques');
@@ -108,8 +112,8 @@ Route::prefix('agent')
     Route::get('/admin/logs',         [AgentController::class, 'dashboard'])->name('admin.logs');
 
     // Traitement + finaliser  declaration
-    Route::post('/declarations/{declaration}/traiter', [TraitementController::class, 'traiter'])->name('traiter');
-    Route::post('/declarations/{declaration}/terminer', [TraitementController::class, 'terminer'])->name('terminer');
+    Route::post('/declarations/{declaration}/traiter',   [TraitementController::class, 'traiter'])->name('traiter');
+    Route::post('/declarations/{declaration}/terminer',  [TraitementController::class, 'terminer'])->name('terminer');
 
     // Historique d'une déclaration (espace agent)
     Route::get('/declarations/{declaration}/historique', [AgentController::class, 'historique'])->name('declarations.historique');

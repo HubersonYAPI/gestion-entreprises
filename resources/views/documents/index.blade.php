@@ -21,6 +21,41 @@
         {{ session('success') }}
     </div>
     @endif
+    @if(session('error'))
+    <div class="ua-err">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        {{ session('error') }}
+    </div>
+    @endif
+
+    {{-- Statut banner --}}
+    @php
+        $sMap = ['brouillon'=>['Brouillon','ub-gray','#f1f5f9','#475569'],'soumis'=>['Soumis','ub-blue','#dbeafe','#1d4ed8'],'en_traitement'=>['En traitement','ub-yellow','#fef9c3','#92400e'],'validé'=>['Validée','ub-green','#d1fae5','#065f46'],'rejeté'=>['Rejetée','ub-red','#fee2e2','#991b1b']];
+        [$sl,$sc,$sbg,$stxt] = $sMap[$declaration->statut] ?? [ucfirst($declaration->statut),'ub-gray','#f1f5f9','#475569'];
+    @endphp
+    <div style="background:{{ $sbg }};border:1px solid {{ $sbg }};border-radius:10px;padding:.85rem 1.2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem">
+        <div style="display:flex;align-items:center;gap:.75rem">
+            <span class="ubadge {{ $sc }}" style="font-size:.75rem;padding:4px 10px"> Statut : {{ $sl }}</span>
+            <span style="font-size:.8rem;color:{{ $stxt }};font-weight:600">Phase : {{ $declaration->phase_label }}</span>
+        </div>
+        @if($declaration->statut === 'brouillon')
+        <div class="uactions">
+            <a href="{{ route('declarations.edit', $declaration) }}" class="ubtn ubtn-warn ubtn-sm">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                Modifier
+            </a>
+            <form action="{{ route('declarations.submit', $declaration->id) }}" method="POST" style="display:inline">
+                @csrf
+                <button type="submit" class="ubtn ubtn-ok ubtn-sm" onclick="return confirm('Soumettre cette déclaration ?')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    Soumettre
+                </button>
+            </form>
+        </div>
+        @endif
+    </div>
 
     {{-- Infos entreprise --}}
     <div class="ucard">

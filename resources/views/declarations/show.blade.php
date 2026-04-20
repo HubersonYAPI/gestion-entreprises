@@ -2,11 +2,27 @@
 @include('components.ui-styles')
 <div class="upg upg-wide">
 
+    {{-- ── Alertes ── --}}
+    @if(session('success'))
+    <div class="ua-ok">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        {{ session('success') }}
+    </div>
+    @endif
+    @if(session('error'))
+    <div class="ua-err">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        {{ session('error') }}
+    </div>
+    @endif
+
     {{-- Header --}}
     <div class="upg-hd">
         <div>
             <div class="upg-title">Déclaration — {{ $declaration->reference }}</div>
-            <div class="upg-sub">Soumise le {{ $declaration->created_at->format('d/m/Y à H:i') }}</div>
+            <div class="upg-sub">Soumise le {{ $declaration->created_at->format('d/m/Y') }}</div>
         </div>
         <a href="{{ route('declarations.index') }}" class="ubtn ubtn-secondary">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>

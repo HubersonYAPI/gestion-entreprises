@@ -37,18 +37,20 @@
     <div class="filters">
         <a href="{{ route('declarations.index') }}"
            class="flt {{ !request('statut') ? 'on':'' }}">Toutes</a>
+        <a href="{{ route('declarations.index', ['statut'=>'brouillon']) }}"
+           class="flt {{ request('statut')==='brouillon' ? 'on':'' }}">Brouillons</a>
         <a href="{{ route('declarations.index', ['statut'=>'soumis']) }}"
            class="flt {{ request('statut')==='soumis' ? 'on':'' }}">Soumises</a>
-        <a href="{{ route('declarations.index', ['statut'=>'validé']) }}"
-           class="flt {{ request('statut')==='validé' ? 'on':'' }}">Validées</a>
-        <a href="{{ route('declarations.index', ['statut'=>'rejeté']) }}"
-           class="flt {{ request('statut')==='rejeté' ? 'on':'' }}">Rejetées</a>
-        <a href="{{ route('declarations.index', ['statut'=>'non_paye']) }}"
-           class="flt {{ request('statut')==='non_paye' ? 'on':'' }}">Att. paiement</a>
+        <a href="{{ route('declarations.index', ['statut'=>'approuve']) }}"
+           class="flt {{ request('statut')==='approuve' ? 'on':'' }}">En attente paiement</a>
+        <a href="{{ route('declarations.index', ['statut'=>'paye']) }}"
+           class="flt {{ request('statut')==='paye' ? 'on':'' }}">Soldées</a>
         <a href="{{ route('declarations.index', ['statut'=>'en_traitement']) }}"
            class="flt {{ request('statut')==='en_traitement' ? 'on':'' }}">En traitement</a>
-        <a href="{{ route('declarations.index', ['statut'=>'finalise']) }}"
-           class="flt {{ request('statut')==='finalise' ? 'on':'' }}">Finalisées</a>
+        <a href="{{ route('declarations.index', ['statut'=>'valide']) }}"
+           class="flt {{ request('statut')==='valide' ? 'on':'' }}">Validées</a>
+        <a href="{{ route('declarations.index', ['statut'=>'rejete']) }}"
+           class="flt {{ request('statut')==='rejete' ? 'on':'' }}">Rejetées</a>
     </div>
 
     {{-- ── Table ── --}}
@@ -79,16 +81,16 @@
                     </tr>
                 </thead>
                 <tbody>
-                @forelse($declarations as $declaration)
+                @foreach($declarations as $declaration)
                     @php
                         $sMap = [
-                            'brouillon'     => ['Brouillon',     'ub-gray'],
-                            'soumis'        => ['Soumis',        'ub-blue'],
-                            'en_traitement' => ['En traitement', 'ub-yellow'],
-                            'validé'        => ['Validée',       'ub-green'],
-                            'rejeté'        => ['Rejetée',       'ub-red'],
-                            'non_paye'      => ['Att. paiement', 'ub-orange'],
-                            'finalise'      => ['Finalisée',     'ub-purple'],
+                            'brouillon'     => ['Brouillons',          'ub-indigo'],
+                            'soumis'        => ['Soumises',            'ub-blue'],
+                            'approuve'      => ['En attente paiement', 'ub-green'],
+                            'paye'          => ['Soldées',             'ub-teal'],
+                            'en_traitement' => ['En traitement',       'ub-yellow'],
+                            'valide'        => ['Validées',            'ub-purple'],
+                            'rejete'        => ['Rejetées',            'ub-red'],
                         ];
                         [$sl, $sc] = $sMap[$declaration->statut] ?? [ucfirst($declaration->statut), 'ub-gray'];
                     @endphp
@@ -189,7 +191,7 @@
                                             </button>
                                         </form>
 
-                                    @elseif($declaration->statut === 'rejeté')
+                                    @elseif($declaration->statut === 'rejete')
 
                                         <a href="{{ route('documents.index', $declaration) }}" class="act-item c-doc">
                                             <span class="act-ico">
@@ -201,7 +203,7 @@
                                             Voir les documents
                                         </a>
 
-                                    @elseif($declaration->statut === 'validé')
+                                    @elseif($declaration->statut === 'valide')
 
                                         <a href="{{ route('paiement.show', $declaration) }}" class="act-item c-pay">
                                             <span class="act-ico">
@@ -234,25 +236,8 @@
                                 </div>{{-- /.act-menu --}}
                             </div>{{-- /.act-wrap --}}
                         </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="6">
-                            <div class="uempty">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-                                    <path d="M14 2v6h6"/>
-                                </svg>
-                                Aucune déclaration pour l'instant.<br>
-                                <a href="{{ route('declarations.create') }}"
-                                   class="ubtn ubtn-primary ubtn-sm"
-                                   style="margin-top:.75rem;display:inline-flex">
-                                    Créer ma première déclaration
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                @endforelse
+                    </tr>                  
+                @endforeach
                 </tbody>
             </table>
         </div>

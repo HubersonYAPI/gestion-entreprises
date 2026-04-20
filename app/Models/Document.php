@@ -17,6 +17,9 @@ class Document extends Model
         'commentaire',
     ];
 
+    // 🔥 Synchronisation automatique
+    protected $touches = ['declaration'];
+
     public function declaration()
     {
         return $this->belongsTo(Declaration::class);

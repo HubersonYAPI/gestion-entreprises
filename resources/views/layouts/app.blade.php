@@ -258,29 +258,33 @@
                            class="sb-sl {{ request()->routeIs('declarations.index') && !request('statut') ? 'act':'' }}">
                             <span class="sdot" style="background:#6b7280"></span>Toutes
                         </a>
+                        <a href="{{ route('declarations.index', ['statut'=>'brouillon']) }}"
+                           class="sb-sl {{ request('statut')==='brouillon' ? 'act':'' }}">
+                            <span class="sdot" style="background:#6366f1"></span>Brouillons
+                        </a>
                         <a href="{{ route('declarations.index', ['statut'=>'soumis']) }}"
                            class="sb-sl {{ request('statut')==='soumis' ? 'act':'' }}">
                             <span class="sdot" style="background:#3b82f6"></span>Soumises
                         </a>
-                        <a href="{{ route('declarations.index', ['statut'=>'validé']) }}"
-                           class="sb-sl {{ request('statut')==='validé' ? 'act':'' }}">
-                            <span class="sdot" style="background:#10b981"></span>Validées
+                        <a href="{{ route('declarations.index', ['statut'=>'approuve']) }}"
+                           class="sb-sl {{ request('statut')==='approuve' ? 'act':'' }}">
+                            <span class="sdot" style="background:#10b981"></span>En attente paiement
                         </a>
-                        <a href="{{ route('declarations.index', ['statut'=>'rejeté']) }}"
-                           class="sb-sl {{ request('statut')==='rejeté' ? 'act':'' }}">
-                            <span class="sdot" style="background:#ef4444"></span>Rejetées
-                        </a>
-                        <a href="{{ route('declarations.index', ['statut'=>'non_paye']) }}"
-                           class="sb-sl {{ request('statut')==='non_paye' ? 'act':'' }}">
-                            <span class="sdot" style="background:#f97316"></span>En attente paiement
+                        <a href="{{ route('declarations.index', ['statut'=>'paye']) }}"
+                           class="sb-sl {{ request('statut')==='paye' ? 'act':'' }}">
+                            <span class="sdot" style="background:#14b8a6"></span>Soldées
                         </a>
                         <a href="{{ route('declarations.index', ['statut'=>'en_traitement']) }}"
                            class="sb-sl {{ request('statut')==='en_traitement' ? 'act':'' }}">
                             <span class="sdot" style="background:#f59e0b"></span>En traitement
                         </a>
-                        <a href="{{ route('declarations.index', ['statut'=>'finalise']) }}"
-                           class="sb-sl {{ request('statut')==='finalise' ? 'act':'' }}">
-                            <span class="sdot" style="background:#8b5cf6"></span>Finalisées
+                        <a href="{{ route('declarations.index', ['statut'=>'valide']) }}"
+                           class="sb-sl {{ request('statut')==='valide' ? 'act':'' }}">
+                            <span class="sdot" style="background:#a855f7"></span>Validées
+                        </a>
+                        <a href="{{ route('declarations.index', ['statut'=>'rejete']) }}"
+                           class="sb-sl {{ request('statut')==='rejete' ? 'act':'' }}">
+                            <span class="sdot" style="background:#ef4444"></span>Rejetées
                         </a>
                     </div>
                 </div>
@@ -312,20 +316,15 @@
                 </div>
 
                 {{-- Attestations --}}
-                <div>
-                    <button @click="tm('at')" class="sb-link" :class="{'op': menu==='at'}">
+                <div> 
+                    <a href="{{ route('attestations.index') }}"
+                    class="sb-link {{ request()->routeIs('attestations.*') ? 'act':'' }}">
                         <svg class="sb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <circle cx="12" cy="8" r="6"/>
                             <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>
                         </svg>
                         <span class="sb-lbl">Attestations</span>
-                        <svg class="sb-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
-                    </button>
-                    <div class="sb-sub" :class="{'op': menu==='at'}">
-                        <a href="#" class="sb-sl"><span class="sdot" style="background:#f97316"></span>En cours</a>
-                        <a href="#" class="sb-sl"><span class="sdot" style="background:#8b5cf6"></span>Finalisées</a>
-                        <a href="#" class="sb-sl"><span class="sdot" style="background:#14b8a6"></span>Toutes</a>
-                    </div>
+                    </a>
                 </div>
 
             @endif

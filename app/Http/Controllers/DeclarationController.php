@@ -35,6 +35,23 @@ class DeclarationController extends Controller
 
         return $query->latest('updated_at')->paginate(10);
     }
+
+    private function getCounts($gerant): array
+    {
+        $base = Declaration::whereHas('entreprise', fn($q) => $q->where('gerant_id', $gerant->id));
+
+        return [
+            'total'    => (clone $base)->count(),
+            'brou'     => (clone $base)->where('statut', 'brouillon')->count(),
+            'soumis'   => (clone $base)->where('statut', 'soumis')->count(),
+            'approuve' => (clone $base)->where('statut', 'approuve')->count(),
+            'paye'     => (clone $base)->where('statut', 'paye')->count(),
+            'enTrait'  => (clone $base)->where('statut', 'en_traitement')->count(),
+            'valide'   => (clone $base)->where('statut', 'valide')->count(),
+            'rejete'   => (clone $base)->where('statut', 'rejete')->count(),
+        ];
+    }
+
     /**
      * Dashboard + liste filtrée des déclarations du gérant
      * Supporte le paramètre ?statut=xxx pour filtrer (identique à AgentController)
@@ -42,13 +59,15 @@ class DeclarationController extends Controller
     public function dashboard(Request $request)
     {
         $declarations = $this->getDeclarations($request);
-        return view('dashboard', compact('declarations'));
+        $counts       = $this->getCounts(Auth::user()->gerant);
+        return view('dashboard', compact('declarations', 'counts'));
     }
 
     public function index(Request $request)
     {
         $declarations = $this->getDeclarations($request);
-        return view('declarations.index', compact('declarations'));
+        $counts       = $this->getCounts(Auth::user()->gerant);
+        return view('declarations.index', compact('declarations', 'counts'));
     }
 
     /**

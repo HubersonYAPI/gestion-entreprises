@@ -213,6 +213,7 @@
         .dot-gray   { background: #6b7280; }
         .dot-orange { background: #f97316; }
         .dot-teal   { background: #14b8a6; }
+        .dot-purple   { background: #a855f7; }
 
         /* Sidebar collapsed — tooltip labels */
         .sidebar.collapsed .nav-label,
@@ -480,20 +481,26 @@
                     </svg>
                 </button>
                 <div class="nav-sub" :class="{ 'open': openMenu === 'decl' || {{ request()->routeIs('agent.declarations.*') ? 'true' : 'false' }} }">
-                    <a href="{{ route('agent.declarations.soumis') }}" class="nav-sub-link {{ request()->routeIs('agent.declarations.soumis') ? 'active' : '' }}">
-                        <span class="sub-dot dot-blue"></span> Soumis
+                    <a href="{{ route('agent.dashboard') }}" class="nav-sub-link {{ request()->routeIs('agent.dashboard') ? 'active' : '' }}">
+                        <span class="sub-dot dot-gray"></span> Toutes
                     </a>
-                    <a href="{{ route('agent.declarations.non-paye') }}" class="nav-sub-link {{ request()->routeIs('agent.declarations.non-paye') ? 'active' : '' }}">
-                        <span class="sub-dot dot-red"></span> Non Payé
+                    <a href="{{ route('agent.declarations.soumis') }}" class="nav-sub-link {{ request()->routeIs('agent.declarations.soumis') ? 'active' : '' }}">
+                        <span class="sub-dot dot-blue"></span> Soumises
+                    </a>
+                    <a href="{{ route('agent.declarations.approuver') }}" class="nav-sub-link {{ request()->routeIs('agent.declarations.approuver') ? 'active' : '' }}">
+                        <span class="sub-dot dot-green"></span> Approuvées
+                    </a>
+                    <a href="{{ route('agent.declarations.payer') }}" class="nav-sub-link {{ request()->routeIs('agent.declarations.payer') ? 'active' : '' }}">
+                        <span class="sub-dot dot-teal"></span> Soldées
                     </a>
                     <a href="{{ route('agent.declarations.en-traitement') }}" class="nav-sub-link {{ request()->routeIs('agent.declarations.en-traitement') ? 'active' : '' }}">
                         <span class="sub-dot dot-yellow"></span> En Traitement
                     </a>
                     <a href="{{ route('agent.declarations.valider') }}" class="nav-sub-link {{ request()->routeIs('agent.declarations.valider') ? 'active' : '' }}">
-                        <span class="sub-dot dot-green"></span> Validées
+                        <span class="sub-dot dot-purple"></span> Validées
                     </a>
                     <a href="{{ route('agent.declarations.rejeter') }}" class="nav-sub-link {{ request()->routeIs('agent.declarations.rejeter') ? 'active' : '' }}">
-                        <span class="sub-dot dot-gray"></span> Rejetées
+                        <span class="sub-dot dot-red"></span> Rejetées
                     </a>
                 </div>
             </div>
@@ -513,11 +520,11 @@
                     </svg>
                 </button>
                 <div class="nav-sub" :class="{ 'open': openMenu === 'entr' || {{ request()->routeIs('agent.entreprises.*') || request()->routeIs('agent.gerants.*') ? 'true' : 'false' }} }">
-                    <a href="{{ route('agent.entreprises.index') }}" class="nav-sub-link {{ request()->routeIs('agent.entreprises.index') ? 'active' : '' }}">
+                    <a href="{{ route('agent.entreprises') }}" class="nav-sub-link {{ request()->routeIs('agent.entreprises') ? 'active' : '' }}">
                         <svg style="width:11px;height:11px;opacity:.5;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/></svg>
                         Entreprises
                     </a>
-                    <a href="{{ route('agent.gerants.index') }}" class="nav-sub-link {{ request()->routeIs('agent.gerants.index') ? 'active' : '' }}">
+                    <a href="{{ route('agent.gerants') }}" class="nav-sub-link {{ request()->routeIs('agent.gerants') ? 'active' : '' }}">
                         <svg style="width:11px;height:11px;opacity:.5;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/></svg>
                         Gérants
                     </a>
@@ -526,26 +533,13 @@
 
             {{-- Attestations --}}
             <div class="nav-item">
-                <button @click="toggleMenu('attest')"
-                        class="nav-link {{ request()->routeIs('agent.attestations.*') ? 'active' : '' }}"
-                        :class="{ 'open': openMenu === 'attest' }">
+                <a href="{{ route('agent.attestations') }}" class="nav-link">
                     <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="8" r="6"/>
                         <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>
                     </svg>
                     <span class="nav-label">Attestations</span>
-                    <svg class="nav-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                        <path d="M9 18l6-6-6-6"/>
-                    </svg>
-                </button>
-                <div class="nav-sub" :class="{ 'open': openMenu === 'attest' || {{ request()->routeIs('agent.attestations.*') ? 'true' : 'false' }} }">
-                    <a href="{{ route('agent.attestations.en-cours') }}" class="nav-sub-link {{ request()->routeIs('agent.attestations.en-cours') ? 'active' : '' }}">
-                        <span class="sub-dot dot-orange"></span> En Cours
-                    </a>
-                    <a href="{{ route('agent.attestations.index') }}" class="nav-sub-link {{ request()->routeIs('agent.attestations.index') ? 'active' : '' }}">
-                        <span class="sub-dot" style="background:#6366f1"></span> Toutes
-                    </a>
-                </div>
+                </a>
             </div>
 
             <div class="sidebar-divider"></div>
