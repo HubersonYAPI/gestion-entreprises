@@ -12,6 +12,8 @@ class AttestationController extends Controller
     {
         $gerant = Auth::user()->gerant;
 
+        //abort_if(!$gerant, 403);  ou redirect selon ton besoin
+
         if (!$gerant) {
             return redirect()->route('gerant.edit')
                 ->with('error', 'Aucun profil gérant trouvé.');

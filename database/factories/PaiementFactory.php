@@ -18,19 +18,13 @@ class PaiementFactory extends Factory
     {
         return [
             'declaration_id' => Declaration::factory(),
-            'montant'        => $this->faker->randomElement([10000, 25000, 50000, 75000, 100000]),
+            // Montant fixe de 10 000 FCFA comme dans PaiementController::payer()
+            'montant'        => 10000,
             'reference'      => 'PAY-' . strtoupper(Str::random(8)),
-            'statut'         => 'payé',
+            // Statut aligné avec PaiementController (valeur 'paye' sans accent)
+            'statut'         => 'paye',
             'date_paiement'  => now()->subDays(rand(0, 5)),
         ];
     }
 
-    /** Paiement en attente */
-    public function enAttente(): static
-    {
-        return $this->state(fn () => [
-            'statut'        => 'en_attente',
-            'date_paiement' => null,
-        ]);
-    }
 }

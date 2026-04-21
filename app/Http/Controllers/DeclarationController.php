@@ -58,6 +58,15 @@ class DeclarationController extends Controller
      */
     public function dashboard(Request $request)
     {
+        $gerant = Auth::user()->gerant;
+
+        //abort_if(!$gerant, 403);  ou redirect selon ton besoin
+
+        if (!$gerant) {
+            return redirect()->route('gerant.edit')
+                ->with('error', 'Aucun profil gérant trouvé.');
+        }
+
         $declarations = $this->getDeclarations($request);
         $counts       = $this->getCounts(Auth::user()->gerant);
         return view('dashboard', compact('declarations', 'counts'));

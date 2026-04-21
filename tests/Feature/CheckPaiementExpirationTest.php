@@ -1,97 +1,94 @@
 <?php
 
 use App\Models\Declaration;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Artisan;
+use App\Models\Entreprise;
+use App\Models\Gerant;
+use App\Models\User;
+use Carbon\Carbon;
+use Database\Seeders\RoleSeeder;
 
-uses(RefreshDatabase::class);
+uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
-// ─────────────────────────────────────────────
-// TEST : expiration appliquée correctement
-// ─────────────────────────────────────────────
+function declarationApprouvee(Carbon $dateLimite): Declaration
+{
+    $user        = User::factory()->create();
+    $gerant      = Gerant::factory()->create(['user_id' => $user->id]);
+    $entreprise  = Entreprise::factory()->create(['gerant_id' => $gerant->id]);
 
-test('la commande expire les paiements dont la date est dépassée', function () {
-
-    // Déclaration expirée
-    $expired = Declaration::factory()->create([
-        'statut' => 'validé',
-        'date_limite_paiement' => now()->subHours(2),
+    return Declaration::factory()->enAttentePaiement()->create([
+        'entreprise_id'        => $entreprise->id,
+        'date_limite_paiement' => $dateLimite,
     ]);
+}
 
-    // Déclaration encore valide
-    $valid = Declaration::factory()->create([
-        'statut' => 'validé',
-        'date_limite_paiement' => now()->addHours(2),
-    ]);
+// ── Setup ─────────────────────────────────────────────────────────────────────
 
-    // Exécuter la commande
-    Artisan::call('paiement:expire');
-
-    // Vérifie que la première est expirée
-    $this->assertDatabaseHas('declarations', [
-        'id' => $expired->id,
-        'statut' => 'expiré',
-    ]);
-
-    // Vérifie que l'autre n'a pas changé
-    $this->assertDatabaseHas('declarations', [
-        'id' => $valid->id,
-        'statut' => 'validé',
-    ]);
+beforeEach(function () {
+    $this->seed(RoleSeeder::class);
 });
 
+// ── Tests ─────────────────────────────────────────────────────────────────────
 
-// ─────────────────────────────────────────────
-// TEST : ignore si pas de date limite
-// ─────────────────────────────────────────────
+describe('Command: paiement:expire', function () {
 
-test('la commande ignore les declarations sans date limite', function () {
+    it('expire les déclarations dont la date limite est dépassée', function () {
+        $expirée    = declarationApprouvee(Carbon::now()->subHour());
+        $nonExpirée = declarationApprouvee(Carbon::now()->addHours(24));
 
-    $declaration = Declaration::factory()->create([
-        'statut' => 'validé',
-        'date_limite_paiement' => null,
-    ]);
+        $this->artisan('paiement:expire')->assertSuccessful();
 
-    Artisan::call('paiement:expire');
+        expect($expirée->fresh()->statut)->toBe('rejete');
+        expect($nonExpirée->fresh()->statut)->toBe('approuve');
+    });
 
-    $this->assertDatabaseHas('declarations', [
-        'id' => $declaration->id,
-        'statut' => 'validé',
-    ]);
-});
+    it('n\'affecte pas les déclarations sans date limite', function () {
+        $user        = User::factory()->create();
+        $gerant      = Gerant::factory()->create(['user_id' => $user->id]);
+        $entreprise  = Entreprise::factory()->create(['gerant_id' => $gerant->id]);
 
+        $declaration = Declaration::factory()->valide()->create([
+            'entreprise_id'        => $entreprise->id,
+            'date_limite_paiement' => null,
+        ]);
 
-// ─────────────────────────────────────────────
-// TEST : ignore les statuts déjà traités
-// ─────────────────────────────────────────────
+        $this->artisan('paiement:expire')->assertSuccessful();
 
-test('la commande ne modifie pas les declarations deja payees', function () {
+        expect($declaration->fresh()->statut)->toBe('valide');
+    });
 
-    $declaration = Declaration::factory()->create([
-        'statut' => 'payé',
-        'date_limite_paiement' => now()->subHours(5),
-    ]);
+    it('n\'affecte pas les déclarations qui ne sont pas en statut valide', function () {
+        $user        = User::factory()->create();
+        $gerant      = Gerant::factory()->create(['user_id' => $user->id]);
+        $entreprise  = Entreprise::factory()->create(['gerant_id' => $gerant->id]);
 
-    Artisan::call('paiement:expire');
+        $declaration = Declaration::factory()->soumis()->create([
+            'entreprise_id'        => $entreprise->id,
+            'date_limite_paiement' => Carbon::now()->subHour(),
+        ]);
 
-    $this->assertDatabaseHas('declarations', [
-        'id' => $declaration->id,
-        'statut' => 'payé',
-    ]);
-});
+        $this->artisan('paiement:expire')->assertSuccessful();
 
+        // statut = 'soumis', non concerné par la commande (qui cible 'valide')
+        expect($declaration->fresh()->statut)->toBe('soumis');
+    });
 
-// ─────────────────────────────────────────────
-// TEST : message console
-// ─────────────────────────────────────────────
+    it('affiche un message de succès', function () {
+        $this->artisan('paiement:expire')
+            ->expectsOutput('Paiements expirés mis à jour')
+            ->assertSuccessful();
+    });
 
-test('la commande affiche un message de succès', function () {
+    it('expire plusieurs déclarations en une seule exécution', function () {
+        $exp1 = declarationApprouvee(Carbon::now()->subMinutes(10));
+        $exp2 = declarationApprouvee(Carbon::now()->subDays(2));
+        $ok   = declarationApprouvee(Carbon::now()->addHours(10));
 
-    Artisan::call('paiement:expire');
+        $this->artisan('paiement:expire');
 
-    $this->assertStringContainsString(
-        'Paiements expirés mis à jour',
-        Artisan::output()
-    );
+        expect($exp1->fresh()->statut)->toBe('rejete');
+        expect($exp2->fresh()->statut)->toBe('rejete');
+        expect($ok->fresh()->statut)->toBe('approuve');
+    });
 });

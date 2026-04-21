@@ -2,16 +2,17 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
-     * Utilise firstOrCreate pour éviter les doublons.
+     * Seeder minimal — comptes de test rapide.
+     * Pour un seed complet avec gérants/entreprises/déclarations,
+     * utiliser DatabaseSeeder.
      */
     public function run(): void
     {
@@ -19,36 +20,48 @@ class UserSeeder extends Seeder
         // SUPER ADMIN
         // =====================
         $admin = User::firstOrCreate(
-            ['email' => 'admin@dsi.com'],
+            ['email' => 'admin@test.com'],
             [
                 'name'     => 'Admin DSI',
                 'password' => Hash::make('Admin1234'),
             ]
         );
-        $admin->assignRole('SUPER_ADMIN');
+        $admin->syncRoles('SUPER_ADMIN');
 
         // =====================
         // AGENT
         // =====================
         $agent = User::firstOrCreate(
-            ['email' => 'agent@ministere.com'],
+            ['email' => 'agent@test.com'],
             [
-                'name'     => 'Agent Industrie',
+                'name'     => 'Kouassi Jean-Baptiste',
                 'password' => Hash::make('Admin1234'),
             ]
         );
-        $agent->assignRole('AGENT');
+        $agent->syncRoles('AGENT');
+
+        // =====================
+        // CONTROLEUR
+        // =====================
+        $controleur = User::firstOrCreate(
+            ['email' => 'controleur@test.com'],
+            [
+                'name'     => 'Yao Félicité',
+                'password' => Hash::make('Admin1234'),
+            ]
+        );
+        $controleur->syncRoles('CONTROLEUR');
 
         // =====================
         // GERANT
         // =====================
         $gerant = User::firstOrCreate(
-            ['email' => 'gerant@entreprise.com'],
+            ['email' => 'gerant@test.com'],
             [
-                'name'     => 'Gérant Entreprise',
+                'name'     => 'Coulibaly Seydou',
                 'password' => Hash::make('Admin1234'),
             ]
         );
-        $gerant->assignRole('GERANT');
+        $gerant->syncRoles('GERANT');
     }
 }

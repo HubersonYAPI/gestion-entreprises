@@ -12,37 +12,40 @@ class DeclarationFactory extends Factory
      */
     protected static int $counter = 1;
 
-    /**
-     * Define the model's default state.
-     */
     public function definition(): array
     {
         $prefix = 'DECL';
-        $date   = now()->format('ym');   // ex: 2604
+        $date   = now()->format('ym');
         $numero = str_pad(self::$counter++, 4, '0', STR_PAD_LEFT);
 
         return [
-            // Relation
-            'entreprise_id' => Entreprise::factory(),
-
-            // Référence unique (réinitialisée à chaque php artisan db:seed)
-            'reference' => "$prefix-$date-$numero",
-
-            // Statut & workflow — valeurs par défaut (brouillon / phase 1)
-            'statut' => 'brouillon',
-            'phase'  => 1,
-
-            // Infos métier
-            'nature_activite'  => $this->faker->word(),
-            'secteur_activite' => $this->faker->randomElement([
-                'Commerce', 'Industrie', 'Éducation', 'BTP',
-                'Informatique', 'Santé', 'Tourisme', 'Agriculture',
-                'Communication', 'Service',
+            'entreprise_id'    => Entreprise::factory(),
+            'reference'        => "$prefix-$date-$numero",
+            'statut'           => 'brouillon',
+            'phase'            => 1,
+            'nature_activite'  => $this->faker->randomElement([
+                'Commerce général', 'Vente de produits alimentaires',
+                'Prestation de services informatiques', 'Import-Export',
+                'Travaux de construction', 'Activité de transport',
+                'Distribution de matériaux', 'Conseil et formation',
             ]),
-            'produits'  => $this->faker->sentence(),
+            'secteur_activite' => $this->faker->randomElement([
+                'Commerce', 'Industrie', 'BTP', 'Informatique',
+                'Santé', 'Tourisme', 'Agriculture', 'Transport',
+                'Communication', 'Service', 'Éducation', 'Finance',
+            ]),
+            'produits'  => $this->faker->randomElement([
+                'Riz, huile, sucre, produits alimentaires divers',
+                'Matériaux de construction : ciment, fer, gravier',
+                'Équipements informatiques et accessoires',
+                'Véhicules et pièces détachées automobiles',
+                'Textiles, prêt-à-porter et chaussures',
+                'Produits pharmaceutiques et parapharmaceutiques',
+                'Mobilier de bureau et fournitures scolaires',
+                'Engins agricoles et intrants agricoles',
+            ]),
             'effectifs' => $this->faker->numberBetween(1, 200),
-
-            // Toutes les dates nullable par défaut
+            'commentaire'           => null,
             'submitted_at'          => null,
             'validated_at'          => null,
             'date_limite_paiement'  => null,
@@ -52,9 +55,9 @@ class DeclarationFactory extends Factory
         ];
     }
 
-    // ── States pratiques ──────────────────────────────────────
+    // ── States ──────────────────────────────────────────────────
 
-    /** Déclaration soumise (phase 2) */
+    /** Phase 2 — Soumis */
     public function soumis(): static
     {
         return $this->state(fn () => [
@@ -64,40 +67,73 @@ class DeclarationFactory extends Factory
         ]);
     }
 
-    /** En attente de paiement (phase 3) */
+    /** Phase 3 — En attente de paiement (après approbation documents) */
     public function enAttentePaiement(): static
     {
         return $this->state(fn () => [
-            'statut'                => 'en_attente_paiement',
-            'phase'                 => 3,
-            'submitted_at'          => now()->subDays(rand(5, 12)),
-            'validated_at'          => now()->subDays(rand(1, 4)),
-            'date_limite_paiement'  => now()->addDays(rand(3, 7)),
+            'statut'               => 'approuve',
+            'phase'                => 3,
+            'submitted_at'         => now()->subDays(rand(6, 12)),
+            'validated_at'         => now()->subDays(rand(2, 5)),
+            'date_limite_paiement' => now()->addHours(rand(12, 72)),
         ]);
     }
 
-    /** Validée (phase 4) */
+    /** Phase 4 — Payé / En traitement */
+    public function enTraitement(): static
+    {
+        return $this->state(fn () => [
+            'statut'               => 'en_traitement',
+            'phase'                => 4,
+            'submitted_at'         => now()->subDays(rand(8, 15)),
+            'validated_at'         => now()->subDays(rand(5, 8)),
+            'date_limite_paiement' => now()->subDays(rand(1, 4)),
+            'paid_at'              => now()->subDays(rand(1, 3)),
+            'processed_at'         => now()->subDays(rand(0, 1)),
+        ]);
+    }
+
+    /** Phase 5 — Validé (terminé, attestation générée) */
     public function valide(): static
     {
         return $this->state(fn () => [
-            'statut'                => 'validé',
-            'phase'                 => 4,
-            'submitted_at'          => now()->subDays(rand(8, 15)),
-            'validated_at'          => now()->subDays(rand(4, 7)),
-            'date_limite_paiement'  => now()->subDays(rand(1, 3)),
-            'paid_at'               => now()->subDays(rand(0, 2)),
-            'completed_at'          => now()->subDays(rand(0, 1)),
+            'statut'               => 'valide',
+            'phase'                => 5,
+            'submitted_at'         => now()->subDays(rand(10, 20)),
+            'validated_at'         => now()->subDays(rand(7, 10)),
+            'date_limite_paiement' => now()->subDays(rand(4, 6)),
+            'paid_at'              => now()->subDays(rand(3, 5)),
+            'processed_at'         => now()->subDays(rand(2, 4)),
+            'completed_at'         => now()->subDays(rand(0, 2)),
         ]);
     }
 
-    /** Rejetée (phase 2) */
+    /** Phase 2 — Rejeté */
     public function rejete(): static
     {
         return $this->state(fn () => [
-            'statut'       => 'rejeté',
+            'statut'       => 'rejete',
             'phase'        => 2,
             'submitted_at' => now()->subDays(rand(3, 10)),
-            'processed_at' => now()->subDays(rand(1, 3)),
+            'commentaire'  => $this->faker->randomElement([
+                'Documents illisibles ou incomplets.',
+                'Le RCCM fourni ne correspond pas à l\'entreprise déclarée.',
+                'La carte de contribuable est expirée.',
+                'Les produits déclarés ne correspondent pas au secteur d\'activité.',
+                'Formulaire de déclaration mal rempli.',
+            ]),
+        ]);
+    }
+
+    /** Phase 3 — Délai de paiement expiré */
+    public function expire(): static
+    {
+        return $this->state(fn () => [
+            'statut'               => 'rejete',
+            'phase'                => 3,
+            'submitted_at'         => now()->subDays(rand(10, 20)),
+            'validated_at'         => now()->subDays(rand(7, 10)),
+            'date_limite_paiement' => now()->subDays(rand(1, 5)),
         ]);
     }
 }

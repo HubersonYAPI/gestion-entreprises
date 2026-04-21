@@ -9,9 +9,8 @@ use Spatie\Permission\Models\Role;
 class RoleSeeder extends Seeder
 {
     /**
-     * Run the database seeds.
-     * Utilise firstOrCreate pour éviter les doublons si le seeder
-     * est appelé plusieurs fois.
+     * Crée les 4 rôles de l'application.
+     * firstOrCreate = idempotent, peut être appelé plusieurs fois sans erreur.
      */
     public function run(): void
     {

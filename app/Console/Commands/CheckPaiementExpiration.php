@@ -28,10 +28,10 @@ class CheckPaiementExpiration extends Command
      */
     public function handle()
     {
-        Declaration::where('statut', 'valide')
+        Declaration::where('statut', 'approuve')
             ->whereNotNull('date_limite_paiement')
             ->where('date_limite_paiement', '<', Carbon::now())
-            ->update(['statut' => 'expiré']);
+            ->update(['statut' => 'rejete']);
 
         $this->info('Paiements expirés mis à jour');
     }

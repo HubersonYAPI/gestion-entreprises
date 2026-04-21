@@ -20,9 +20,9 @@ test('phase_label retourne "Création" pour la phase 1', function () {
     expect($declaration->phase_label)->toBe('Création');
 });
 
-test('phase_label retourne "Soumission" pour la phase 2', function () {
+test('phase_label retourne "Vérification" pour la phase 2', function () {
     $declaration = new Declaration(['phase' => 2]);
-    expect($declaration->phase_label)->toBe('Soumission');
+    expect($declaration->phase_label)->toBe('Vérification');
 });
 
 test('phase_label retourne "Paiement" pour la phase 3', function () {
@@ -30,9 +30,14 @@ test('phase_label retourne "Paiement" pour la phase 3', function () {
     expect($declaration->phase_label)->toBe('Paiement');
 });
 
-test('phase_label retourne "Terminé" pour la phase 5', function () {
+test('phase_label retourne "Traitement" pour la phase 4', function () {
+    $declaration = new Declaration(['phase' => 4]);
+    expect($declaration->phase_label)->toBe('Traitement');
+});
+
+test('phase_label retourne "Finalisation" pour la phase 5', function () {
     $declaration = new Declaration(['phase' => 5]);
-    expect($declaration->phase_label)->toBe('Terminé');
+    expect($declaration->phase_label)->toBe('Finalisation');
 });
 
 
@@ -52,11 +57,11 @@ test('les statuts du projet sont bien définis et au nombre attendu', function (
     $statuts = [
         'brouillon',
         'soumis',
+        'approuve',
+        'paye',
         'en_traitement',
-        'validé',
-        'rejeté',
-        'non_paye',
-        'finalise',
+        'valide',
+        'rejete',
     ];
     expect($statuts)->toHaveCount(7);
     expect($statuts)->toContain('brouillon');
