@@ -22,8 +22,8 @@
         {{-- Stats mini --}}
         @php
             $total   = $declaration->documents->count();
-            $valides = $declaration->documents->where('statut','validé')->count();
-            $rejetes = $declaration->documents->where('statut','rejeté')->count();
+            $valides = $declaration->documents->where('statut','valide')->count();
+            $rejetes = $declaration->documents->where('statut','rejete')->count();
             $attente = $total - $valides - $rejetes;
             $pct     = $total > 0 ? round($valides / $total * 100) : 0;
         @endphp
@@ -95,8 +95,8 @@
                     <tr>
                         <td class="nm">{{ $doc->type }}</td>
                         <td>
-                            @if($doc->statut === 'validé')   <span class="ds-v">Validé</span>
-                            @elseif($doc->statut === 'rejeté') <span class="ds-r">Rejeté</span>
+                            @if($doc->statut === 'valide')   <span class="ds-v">Validé</span>
+                            @elseif($doc->statut === 'rejete') <span class="ds-r">Rejeté</span>
                             @else <span class="ds-p">En attente</span>
                             @endif
                         </td>
@@ -115,7 +115,7 @@
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
                                 </button>
                                 <div class="dpo-menu" x-show="op" x-transition @click.away="op=false">
-                                    @if($doc->statut !== 'validé')
+                                    @if($doc->statut !== 'valide')
                                     <form action="{{ route('agent.documents.valider', $doc) }}" method="POST">
                                         @csrf
                                         <button type="submit" class="dpo-item ok">
@@ -124,7 +124,7 @@
                                         </button>
                                     </form>
                                     @endif
-                                    @if($doc->statut !== 'rejeté')
+                                    @if($doc->statut !== 'rejete')
                                     <form action="{{ route('agent.documents.rejeter', $doc) }}" method="POST">
                                         @csrf
                                         <button type="submit" class="dpo-item rj">

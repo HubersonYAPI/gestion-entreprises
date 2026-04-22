@@ -83,6 +83,8 @@ class AgentController extends Controller
      */
     public function validerDocument(Document $document)
     {
+        $ancienStatut = $document->statut;
+
         $document->update([
             'statut' => 'valide',
         ]);
@@ -95,6 +97,17 @@ class AgentController extends Controller
         //     'updated_at' => now()
         // ]);
 
+        // ── Log audit ─────────────────────────────────────────────
+        activity('documents')
+            ->causedBy(Auth::user())
+            ->performedOn($document)
+            ->withProperties([
+                'type'            => $document->type,
+                'ancien_statut'   => $ancienStatut,
+                'nouveau_statut'  => 'valide',
+                'declaration_ref' => $document->declaration->reference ?? '—',
+            ])->log('document validé');
+
         return back()->with('success', $document->type . ' validé');
     }
 
@@ -103,12 +116,25 @@ class AgentController extends Controller
      */
     public function rejeterDocument(Document $document)
     {
+        $ancienStatut = $document->statut;
+
         $document->update([
             'statut' => 'rejete',
         ]);
 
         // Met à jour updated_at de la déclaration liée
         $document->declaration->touch();
+
+        // ── Log audit ─────────────────────────────────────────────
+        activity('documents')
+            ->causedBy(Auth::user())
+            ->performedOn($document)
+            ->withProperties([
+                'type'            => $document->type,
+                'ancien_statut'   => $ancienStatut,
+                'nouveau_statut'  => 'rejete',
+                'declaration_ref' => $document->declaration->reference ?? '—',
+            ])->log('document rejeté');
 
         return back()->with('error', $document->type . ' rejeté');
     }
@@ -128,16 +154,25 @@ class AgentController extends Controller
                 return $document->type . ' (' . $document->statut . ')';
             })->implode(', ');
 
+            // ── Log tentative échouée ─────────────────────────────
+            activity('declarations')
+                ->causedBy(Auth::user())
+                ->performedOn($declaration)
+                ->withProperties([
+                    'reference'          => $declaration->reference,
+                    'documents_invalides' => $invalides->pluck('type')->toArray(),
+                ])->log('tentative validation échouée — documents non conformes');
+
             return back()->with('error', 'Impossible de valider. Documents non conformes : ' . $liste);
         }
 
         $ancienStatut = $declaration->statut;
         
         // Tout est OK
-        $dateLimite = Carbon::now()->addHours(72);
+        $dateLimite = Carbon::now()->addHours(48);
 
         $declaration->update([
-            'statut' => 'en_attente_paiement',
+            'statut' => 'approuve',
             'validated_at' => Carbon::now(),
             'date_limite_paiement' => $dateLimite,
             'phase' => 3,
@@ -147,6 +182,18 @@ class AgentController extends Controller
         // Historique + Notification
         HistoriqueService::enregistrer($declaration, 'approuve', request(), 'Tous les documents sont conformes.', $ancienStatut);
         NotificationService::notifier($declaration, 'approuve');
+
+        // ── Log audit ─────────────────────────────────────────────
+        activity('declarations')
+            ->causedBy(Auth::user())
+            ->performedOn($declaration)
+            ->withProperties([
+                'reference'            => $declaration->reference,
+                'ancien_statut'        => $ancienStatut,
+                'nouveau_statut'       => 'approuve',
+                'date_limite_paiement' => $dateLimite->toDateTimeString(),
+                'agent'                => Auth::user()->name,
+            ])->log('declaration validée');
 
         return redirect()->route('agent.dashboard')->with('success', 'Declaration approuvée avec succès');
     }
@@ -167,7 +214,7 @@ class AgentController extends Controller
             'commentaire' => $request->commentaire,
         ]);
 
-        // Historique + Notification
+        // Historique interne + Notification 
         HistoriqueService::enregistrer($declaration, 'rejete', $request, $request->commentaire, $ancienStatut);
         NotificationService::notifier($declaration, 'rejete', $request->commentaire);
         
@@ -181,6 +228,18 @@ class AgentController extends Controller
             // 'commentaire' => $request->commentaire, 
             // ]); 
         // }
+
+        // ── Log audit ─────────────────────────────────────────────
+        activity('declarations')
+            ->causedBy(Auth::user())
+            ->performedOn($declaration)
+            ->withProperties([
+                'reference'      => $declaration->reference,
+                'ancien_statut'  => $ancienStatut,
+                'nouveau_statut' => 'rejete',
+                'commentaire'    => $request->commentaire,
+                'agent'          => Auth::user()->name,
+            ])->log('declaration rejetée');
 
         return redirect()->route('agent.dashboard')->with('error', 'Declaration rejetée');
     }

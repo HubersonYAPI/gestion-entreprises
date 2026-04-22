@@ -37,6 +37,7 @@ class GerantController extends Controller
         ]);
 
         $user = Auth::user();
+        $estNouveau = !$user->gerant; // true si création, false si mise à jour
 
         $data = $request->only([
             'nom',
@@ -57,10 +58,22 @@ class GerantController extends Controller
         }
 
         //create or update
-        $user->gerant()->updateOrCreate(
+        $gerant = $user->gerant()->updateOrCreate(
             ['user_id' => $user->id],
             $data,
         );
+
+        // ── Log audit ─────────────────────────────────────────────
+        activity('gerants')
+            ->causedBy($user)
+            ->performedOn($gerant)
+            ->withProperties([
+                'nom'                 => $gerant->nom,
+                'prenoms'             => $gerant->prenoms,
+                'contact'             => $gerant->contact,
+                'piece_mise_a_jour'   => $request->hasFile('piece_identite'),
+            ])->log($estNouveau ? 'profil gérant créé' : 'profil gérant mis à jour');
+ 
 
         return redirect()->route('gerant.edit')->with('success', 'Profil du Gérant mis à jour');
     }

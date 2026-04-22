@@ -32,7 +32,7 @@
 
     {{-- Statut banner --}}
     @php
-        $sMap = ['brouillon'=>['Brouillon','ub-gray','#f1f5f9','#475569'],'soumis'=>['Soumis','ub-blue','#dbeafe','#1d4ed8'],'en_traitement'=>['En traitement','ub-yellow','#fef9c3','#92400e'],'validé'=>['Validée','ub-green','#d1fae5','#065f46'],'rejeté'=>['Rejetée','ub-red','#fee2e2','#991b1b']];
+        $sMap = ['brouillon'=>['Brouillon','ub-gray','#f1f5f9','#475569'],'soumis'=>['Soumis','ub-blue','#dbeafe','#1d4ed8'],'en_traitement'=>['En traitement','ub-yellow','#fef9c3','#92400e'],'valide'=>['Validée','ub-green','#d1fae5','#065f46'],'rejete'=>['Rejetée','ub-red','#fee2e2','#991b1b']];
         [$sl,$sc,$sbg,$stxt] = $sMap[$declaration->statut] ?? [ucfirst($declaration->statut),'ub-gray','#f1f5f9','#475569'];
     @endphp
     <div style="background:{{ $sbg }};border:1px solid {{ $sbg }};border-radius:10px;padding:.85rem 1.2rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem">
@@ -149,14 +149,17 @@
                         <td class="utbl-nm">{{ $doc->type }}</td>
                         <td>
                             @php
-                                $dm = ['en_attente'=>['En attente','ub-yellow'],'validé'=>['Validé','ub-green'],'rejeté'=>['Rejeté','ub-red']];
+                                $dm = ['en_attente'=>['En attente','ub-yellow'],'valide'=>['Validé','ub-green'],'rejete'=>['Rejeté','ub-red']];
                                 [$dl,$dc] = $dm[$doc->statut] ?? [ucfirst($doc->statut),'ub-gray'];
                             @endphp
                             <span class="ubadge {{ $dc }}">{{ $dl }}</span>
                         </td>
                         <td>
                             <a href="{{ asset('storage/'.$doc->file_path) }}" target="_blank" class="ufile-link">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
                                 Voir le fichier
                             </a>
                         </td>
@@ -167,6 +170,28 @@
         </div>
         @endif
     </div>
+
+    {{-- Commentaire --}}
+    @if ($declaration->statut === 'rejete')        
+        <div class="ucard">
+            <div class="ucard-header">
+                <div class="ucard-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15a4 4 0 0 1-4 4H7l-4 4V5a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/>
+                        <line x1="8" y1="9" x2="16" y2="9"/>
+                        <line x1="8" y1="13" x2="14" y2="13"/>
+                    </svg>
+                    Motif du rejet
+                </div>
+            </div>
+            <div class="ucard-body">
+                <div class="uinfo-grid">
+                    <div class="uinfo-field">{{ $declaration->commentaire }}</div>
+                </div>
+            </div>
+        </div>
+    @endif
+
 
 </div>
 </x-app-layout>

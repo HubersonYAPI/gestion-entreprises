@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Entreprise extends Model
 {
-    use HasFactory; 
+    use HasFactory, LogsActivity; 
     
     protected $fillable = [
         'nom',
@@ -27,5 +29,14 @@ class Entreprise extends Model
     public function declarations()
     {
         return $this->hasMany(Declaration::class);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+        ->logOnly(['statut', 'phase'])
+        ->logOnlyDirty()
+        ->dontSubmitEmptyLogs()
+        ->setDescriptionForEvent(fn(string $eventName) => "Declaration {$eventName}");
     }
 }

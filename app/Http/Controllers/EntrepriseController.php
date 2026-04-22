@@ -47,7 +47,7 @@ class EntrepriseController extends Controller
 
         $gerant = Auth::user()->gerant;
 
-        $gerant->entreprises()->create([
+        $entreprise = $gerant->entreprises()->create([
             'nom' => $request->nom,
             'rccm' => $request->rccm,
             'adresse' => $request->adresse,
@@ -55,6 +55,19 @@ class EntrepriseController extends Controller
             'secteur_activite' => $request->secteur_activite,
             'gerant_id' => $gerant->id,
         ]);
+
+        // ── Log audit ─────────────────────────────────────────────
+        activity('entreprises')
+            ->causedBy(Auth::user())
+            ->performedOn($entreprise)
+            ->withProperties([
+                'nom'              => $entreprise->nom,
+                'rccm'             => $entreprise->rccm,
+                'secteur_activite' => $entreprise->secteur_activite,
+                'type_entreprise'  => $entreprise->type_entreprise,
+                'gerant'           => $gerant->nom . ' ' . $gerant->prenoms,
+            ])
+            ->log('entreprise créée');
 
         return redirect()->route('entreprises.index')->with('success', 'Entreprise créée avec succès');
     }
@@ -92,7 +105,23 @@ class EntrepriseController extends Controller
             'secteur_activite' => 'required',
         ]);
 
+        // Capture avant modification
+        $anciennesValeurs = $entreprise->only([
+            'nom', 'rccm', 'adresse', 'type_entreprise', 'secteur_activite'
+        ]);
+
         $entreprise->update($request->all());
+
+        // ── Log audit ─────────────────────────────────────────────
+        activity('entreprises')
+            ->causedBy(Auth::user())
+            ->performedOn($entreprise)
+            ->withProperties([
+                'avant' => $anciennesValeurs,
+                'apres' => $entreprise->only([
+                    'nom', 'rccm', 'adresse', 'type_entreprise', 'secteur_activite'
+                ]),
+            ])->log('entreprise modifiée');
 
         return redirect()->route('entreprises.index')->with('success', 'Entreprise mise à jour');
     }
@@ -103,6 +132,16 @@ class EntrepriseController extends Controller
     public function destroy(Entreprise $entreprise)
     {
         $this->authorizeAccess($entreprise);
+
+        // ── Log audit AVANT suppression ───────────────────────────
+        activity('entreprises')
+            ->causedBy(Auth::user())
+            ->performedOn($entreprise)
+            ->withProperties([
+                'nom'    => $entreprise->nom,
+                'rccm'   => $entreprise->rccm,
+                'gerant' => Auth::user()->gerant->nom . ' ' . Auth::user()->gerant->prenoms,
+            ])->log('entreprise supprimée');
 
         $entreprise->delete();
 

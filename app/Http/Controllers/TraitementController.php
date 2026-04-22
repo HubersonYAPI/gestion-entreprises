@@ -31,6 +31,18 @@ class TraitementController extends Controller
         HistoriqueService::enregistrer($declaration, 'en_traitement', request(), 'Dossier pris en charge par l\'équipe.', $ancienStatut);
         NotificationService::notifier($declaration, 'en_traitement');
 
+        // ── Log audit ─────────────────────────────────────────────
+        activity('declarations')
+            ->causedBy(Auth::user())
+            ->performedOn($declaration)
+            ->withProperties([
+                'reference'      => $declaration->reference,
+                'ancien_statut'  => $ancienStatut,
+                'nouveau_statut' => 'en_traitement',
+                'processed_at'   => $declaration->processed_at->toDateTimeString(),
+                'agent'          => Auth::user()->name,
+            ])->log('declaration mise en traitement');
+
         return back()->with('success', 'Déclaration mise en traitement');
     }
 
@@ -52,8 +64,8 @@ class TraitementController extends Controller
 
         Storage::disk('public')->put($filePath, $pdf->output());
 
-        // Enregistrement
-        Attestation::create([
+        // Création attestation
+        $attestation = Attestation::create([
             'declaration_id' => $declaration->id,
             'file_path' => $filePath,
             'reference' => 'ATT-' .strtoupper(Str::random(8)),
@@ -70,6 +82,21 @@ class TraitementController extends Controller
 
         HistoriqueService::enregistrer($declaration, 'valide', request(), null, $ancienStatut);
         NotificationService::notifier($declaration, 'valide');
+
+        // ── Log audit ─────────────────────────────────────────────
+        activity('declarations')
+            ->causedBy(Auth::user())
+            ->performedOn($declaration)
+            ->withProperties([
+                'reference'         => $declaration->reference,
+                'ancien_statut'     => $ancienStatut,
+                'nouveau_statut'    => 'valide',
+                'attestation_ref'   => $attestation->reference,
+                'attestation_path'  => $filePath,
+                'completed_at'      => $declaration->completed_at->toDateTimeString(),
+                'agent'             => Auth::user()->name,
+            ])
+            ->log('declaration finalisée — attestation générée');
 
         return back()->with('success', 'Déclaration terminée + attestation générée');
     }

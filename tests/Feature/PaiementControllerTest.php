@@ -73,7 +73,7 @@ describe('PaiementController@payer', function () {
         expect($paiement->montant)->toBe(10000);
         expect($paiement->reference)->toStartWith('PAY-');
 
-        expect($declaration->fresh()->statut)->toBe('en_traitement');
+        expect($declaration->fresh()->statut)->toBe('paye');
         expect($declaration->fresh()->phase)->toBe(4);
         expect($declaration->fresh()->paid_at)->not->toBeNull();
     });
@@ -100,7 +100,7 @@ describe('PaiementController@payer', function () {
             ->assertRedirect(route('declarations.index'))
             ->assertSessionHas('error');
 
-        expect($declaration->fresh()->statut)->toBe('expiré');
+        expect($declaration->fresh()->statut)->toBe('rejete');
     });
 
     it('interdit le paiement d\'une déclaration d\'un autre gérant', function () {

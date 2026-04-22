@@ -6,12 +6,14 @@ use App\Models\Document;
 use App\Models\Paiement;
 use App\Models\Attestation;
 use App\Models\DeclarationHistorique;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Declaration extends Model
 {
-    use HasFactory; 
+    use HasFactory, LogsActivity; 
 
     protected $fillable = [
         'entreprise_id',
@@ -29,6 +31,11 @@ class Declaration extends Model
         'paid_at',
         'processed_at',
         'completed_at',
+    ];
+
+    protected $casts = [
+        'date_limite_paiement' => 'datetime',
+        'completed_at' => 'datetime',
     ];
 
     //Nom de chaque phase
@@ -69,4 +76,14 @@ class Declaration extends Model
     {
         return $this->hasMany(DeclarationHistorique::class)->with('user')->latest();
     }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+        ->logOnly(['statut', 'phase'])
+        ->logOnlyDirty()
+        ->dontSubmitEmptyLogs()
+        ->setDescriptionForEvent(fn(string $eventName) => "Declaration {$eventName}");
+    }
+
 }

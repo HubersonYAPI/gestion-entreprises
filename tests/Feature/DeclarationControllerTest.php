@@ -9,32 +9,33 @@ use Database\Seeders\RoleSeeder;
 
 uses(\Illuminate\Foundation\Testing\RefreshDatabase::class);
 
-// ── Helpers ─────────────────────────────────────────────────────────────────
+// ── Helper ────────────────────────────────────────────────────────────────────
 
 function gerantAvecEntreprise(): array
 {
     $user = User::factory()->create();
     $user->assignRole('GERANT');
 
-    $gerant    = Gerant::factory()->create(['user_id' => $user->id]);
+    $gerant     = Gerant::factory()->create(['user_id' => $user->id]);
     $entreprise = Entreprise::factory()->create(['gerant_id' => $gerant->id]);
 
     return compact('user', 'gerant', 'entreprise');
 }
 
-// ── Setup ────────────────────────────────────────────────────────────────────
+// ── Setup ─────────────────────────────────────────────────────────────────────
 
 beforeEach(function () {
     $this->seed(RoleSeeder::class);
 });
 
-// ── Dashboard ────────────────────────────────────────────────────────────────
+// ── Dashboard ─────────────────────────────────────────────────────────────────
 
 describe('DeclarationController@dashboard', function () {
 
     it('affiche le dashboard au gérant connecté', function () {
         ['user' => $user] = gerantAvecEntreprise();
 
+        // Le controller détecte SQLite et utilise strftime — aucune erreur TO_CHAR
         $this->actingAs($user)
             ->get(route('dashboard'))
             ->assertOk()
@@ -63,6 +64,31 @@ describe('DeclarationController@dashboard', function () {
                 $d->every(fn ($decl) => $decl->statut === 'soumis')
             );
     });
+
+    it('passe les variables graphiques à la vue', function () {
+        ['user' => $user, 'entreprise' => $entreprise] = gerantAvecEntreprise();
+
+        Declaration::factory()->soumis()->create(['entreprise_id' => $entreprise->id]);
+
+        $this->actingAs($user)
+            ->get(route('dashboard'))
+            ->assertOk()
+            ->assertViewHasAll([
+                'counts',
+                'statutLabels',
+                'statutValues',
+                'moisLabels',
+                'moisValues',
+                'secteurLabels',
+                'secteurValues',
+                'totalEntreprises',
+                'validees',
+                'rejetees',
+                'soumises',
+                'tauxValid',
+            ]);
+    });
+
 });
 
 // ── Store ─────────────────────────────────────────────────────────────────────
@@ -80,11 +106,30 @@ describe('DeclarationController@store', function () {
                 'produits'         => 'Riz, huile',
                 'effectifs'        => 5,
             ])
-            ->assertRedirect(route('declarations.index'));
+            ->assertRedirect(); // redirige vers documents.index
 
-        expect(Declaration::where('entreprise_id', $entreprise->id)->count())->toBe(1);
-        expect(Declaration::first()->statut)->toBe('brouillon');
-        expect(Declaration::first()->phase)->toBe(1);
+        $declaration = Declaration::latest()->first();
+
+        expect($declaration)->not->toBeNull();
+        expect($declaration->statut)->toBe('brouillon');
+        expect($declaration->phase)->toBe(1);
+    });
+
+    it('redirige vers la page documents après création', function () {
+        ['user' => $user, 'entreprise' => $entreprise] = gerantAvecEntreprise();
+
+        $response = $this->actingAs($user)
+            ->post(route('declarations.store'), [
+                'entreprise_id'    => $entreprise->id,
+                'nature_activite'  => 'Commerce général',
+                'secteur_activite' => 'Commerce',
+                'produits'         => 'Riz, huile',
+                'effectifs'        => 5,
+            ]);
+
+        $declaration = Declaration::latest()->first();
+
+        $response->assertRedirect(route('documents.index', $declaration));
     });
 
     it('génère une référence unique', function () {
@@ -110,7 +155,13 @@ describe('DeclarationController@store', function () {
 
         $this->actingAs($user)
             ->post(route('declarations.store'), [])
-            ->assertSessionHasErrors(['entreprise_id', 'nature_activite', 'secteur_activite', 'produits', 'effectifs']);
+            ->assertSessionHasErrors([
+                'entreprise_id',
+                'nature_activite',
+                'secteur_activite',
+                'produits',
+                'effectifs',
+            ]);
     });
 
     it('interdit de créer une déclaration pour une entreprise d\'un autre gérant', function () {
@@ -127,9 +178,10 @@ describe('DeclarationController@store', function () {
             ])
             ->assertStatus(404); // findOrFail
     });
+
 });
 
-// ── Submit ────────────────────────────────────────────────────────────────────
+// ── Submit ─────────────────────────────────────────────────────────────────────
 
 describe('DeclarationController@submit', function () {
 
@@ -161,7 +213,7 @@ describe('DeclarationController@submit', function () {
 
         Document::factory()->create([
             'declaration_id' => $declaration->id,
-            'type'           => 'RCCM',
+            'type'           => 'RCCM', // un seul document sur 5
         ]);
 
         $this->actingAs($user)
@@ -172,8 +224,8 @@ describe('DeclarationController@submit', function () {
     });
 
     it('interdit la soumission d\'une déclaration d\'un autre gérant', function () {
-        ['user' => $user]                      = gerantAvecEntreprise();
-        ['entreprise' => $autreEntreprise]     = gerantAvecEntreprise();
+        ['user' => $user]                  = gerantAvecEntreprise();
+        ['entreprise' => $autreEntreprise] = gerantAvecEntreprise();
 
         $declaration = Declaration::factory()->create(['entreprise_id' => $autreEntreprise->id]);
 
@@ -181,9 +233,10 @@ describe('DeclarationController@submit', function () {
             ->post(route('declarations.submit', $declaration))
             ->assertForbidden();
     });
+
 });
 
-// ── Destroy ───────────────────────────────────────────────────────────────────
+// ── Destroy ────────────────────────────────────────────────────────────────────
 
 describe('DeclarationController@destroy', function () {
 
@@ -209,4 +262,5 @@ describe('DeclarationController@destroy', function () {
             ->delete(route('declarations.destroy', $declaration))
             ->assertForbidden();
     });
+
 });

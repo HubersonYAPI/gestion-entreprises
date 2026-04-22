@@ -196,7 +196,7 @@ tbody tr:hover td   { background: #f8f9fd; }
 .b-trait     { background: #fef9c3; color: #92400e; }
 .b-valid     { background: #d1fae5; color: #065f46; }
 .b-rej       { background: #fee2e2; color: #991b1b; }
-.b-np        { background: #ffe4e6; color: #9f1239; }
+.b-np        { background: #d1fae5; color: #059669; }
 .b-def       { background: #f1f5f9; color: #64748b; }
 
 /* Badge phase */

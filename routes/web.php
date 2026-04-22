@@ -10,6 +10,9 @@ use App\Http\Controllers\PaiementController;
 use App\Http\Controllers\TraitementController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\AttestationController;
+use App\Http\Controllers\StatistiqueController;
+use App\Http\Controllers\RapportController;
+use App\Http\Controllers\AuditLogController;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Declaration;
 use App\Models\Gerant;
@@ -103,13 +106,14 @@ Route::prefix('agent')
     Route::get('/attestations',          [AttestationController::class, 'adminIndex'])->name('attestations');
  
     // ── Analyses ───────────────────────────────────────────────
-    Route::get('/analyses/statistiques', [AgentController::class, 'dashboard'])->name('analyses.statistiques');
-    Route::get('/analyses/rapports',     [AgentController::class, 'dashboard'])->name('analyses.rapports');
- 
+    Route::get('/analyses/statistiques', [StatistiqueController::class, 'index'])->name('analyses.statistiques');
+    Route::get('/analyses/rapports',     [RapportController::class,     'index'])->name('analyses.rapports');
+
+
     // ── Administration ─────────────────────────────────────────
     Route::get('/admin/utilisateurs', [AgentController::class, 'dashboard'])->name('admin.utilisateurs');
     Route::get('/admin/roles',        [AgentController::class, 'dashboard'])->name('admin.roles');
-    Route::get('/admin/logs',         [AgentController::class, 'dashboard'])->name('admin.logs');
+    Route::get('/admin/logs',         [AuditLogController::class, 'index'])->name('admin.logs');
 
     // Traitement + finaliser  declaration
     Route::post('/declarations/{declaration}/traiter',   [TraitementController::class, 'traiter'])->name('traiter');

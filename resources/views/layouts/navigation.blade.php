@@ -22,6 +22,11 @@
                         Infos Gerant
                     </x-nav-link>
 
+                    <!-- Profil -->
+                    <x-nav-link :href="route('gerant.show')" :active="request()->routeIs('profile.*')">
+                        Profil
+                    </x-nav-link>
+
                     <!-- Entreprise -->
                     <x-nav-link :href="route('entreprises.index')" :active="request()->routeIs('entreprises.*')">
                         Infos Entreprise

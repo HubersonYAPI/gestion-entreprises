@@ -67,7 +67,7 @@
             <div class="field">
                 <span class="field-l">Statut</span>
                 @php
-                    $sm=['soumis'=>['Soumis','b-soumis'],'non_paye'=>['Non payé','b-np'],'en_traitement'=>['En traitement','b-trait'],'validé'=>['Validée','b-valid'],'rejeté'=>['Rejetée','b-rej']];
+                    $sm=['soumis'=>['Soumis','b-soumis'],'paye'=>['Soldé','b-np'],'en_traitement'=>['En traitement','b-trait'],'valide'=>['Validée','b-valid'],'rejete'=>['Rejetée','b-rej']];
                     [$sl,$sc]=$sm[$declaration->statut]??[ucfirst($declaration->statut),'b-def'];
                 @endphp
                 <span class="field-v"><span class="bx {{ $sc }}">{{ $sl }}</span></span>
@@ -178,7 +178,7 @@
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
                             </button>
                             <div class="dpo-menu" x-show="op" x-transition @click.away="op=false">
-                                @if($doc->statut !== 'validé')
+                                @if($doc->statut !== 'valide')
                                 <form action="{{ route('agent.documents.valider', $doc) }}" method="POST">
                                     @csrf
                                     <button type="submit" class="dpo-item ok">
@@ -187,7 +187,7 @@
                                     </button>
                                 </form>
                                 @endif
-                                @if($doc->statut !== 'rejeté')
+                                @if($doc->statut !== 'rejete')
                                 <form action="{{ route('agent.documents.rejeter', $doc) }}" method="POST">
                                     @csrf
                                     <button type="submit" class="dpo-item rj">

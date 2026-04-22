@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class DeclarationController extends Controller
 {
@@ -53,23 +54,101 @@ class DeclarationController extends Controller
     }
 
     /**
-     * Dashboard + liste filtrée des déclarations du gérant
-     * Supporte le paramètre ?statut=xxx pour filtrer (identique à AgentController)
+     * Retourne les expressions SQL pour le formatage de date
+     * adaptées au driver actif : PostgreSQL en production, SQLite en test.
+     *
+     *   PostgreSQL : TO_CHAR / DATE_TRUNC
+     *   SQLite     : strftime (pas de TO_CHAR natif)
+     */
+    private function sqlDateFormat(string $column): array
+    {
+        if (DB::getDriverName() === 'sqlite') {
+            return [
+                'mois_label' => DB::raw("strftime('%m/%Y', {$column}) as mois"),
+                'mois_trunc' => DB::raw("strftime('%Y-%m', {$column}) as mois_date"),
+            ];
+        }
+ 
+        // PostgreSQL (production / staging)
+        return [
+            'mois_label' => DB::raw("TO_CHAR({$column}, 'Mon YYYY') as mois"),
+            'mois_trunc' => DB::raw("DATE_TRUNC('month', {$column}) as mois_date"),
+        ];
+    }
+
+    /**
+     * Dashboard gérant
      */
     public function dashboard(Request $request)
     {
         $gerant = Auth::user()->gerant;
-
-        //abort_if(!$gerant, 403);  ou redirect selon ton besoin
-
+ 
         if (!$gerant) {
             return redirect()->route('gerant.edit')
                 ->with('error', 'Aucun profil gérant trouvé.');
         }
-
+ 
         $declarations = $this->getDeclarations($request);
-        $counts       = $this->getCounts(Auth::user()->gerant);
-        return view('dashboard', compact('declarations', 'counts'));
+        $counts       = $this->getCounts($gerant);
+ 
+        // ── Base scopée au gérant ─────────────────────────────────
+        $base = Declaration::whereHas('entreprise',
+            fn($q) => $q->where('gerant_id', $gerant->id)
+        );
+ 
+        // ── Répartition par statut ────────────────────────────────
+        $parStatut = (clone $base)
+            ->select('statut', DB::raw('count(*) as total'))
+            ->groupBy('statut')
+            ->pluck('total', 'statut')
+            ->toArray();
+ 
+        $statutLabels = array_keys($parStatut);
+        $statutValues = array_values($parStatut);
+ 
+        // ── Déclarations par mois — driver-aware ──────────────────
+        ['mois_label' => $moisLabel, 'mois_trunc' => $moisTrunc] = $this->sqlDateFormat('created_at');
+ 
+        $parMois = (clone $base)
+            ->select($moisLabel, $moisTrunc, DB::raw('count(*) as total'))
+            ->where('created_at', '>=', now()->subMonths(11)->startOfMonth())
+            ->groupBy('mois', 'mois_date')
+            ->orderBy('mois_date')
+            ->get();
+ 
+        $moisLabels = $parMois->pluck('mois')->toArray();
+        $moisValues = $parMois->pluck('total')->toArray();
+ 
+        // ── Top secteurs ──────────────────────────────────────────
+        $parSecteur = (clone $base)
+            ->select('secteur_activite', DB::raw('count(*) as total'))
+            ->whereNotNull('secteur_activite')
+            ->groupBy('secteur_activite')
+            ->orderByDesc('total')
+            ->limit(6)
+            ->pluck('total', 'secteur_activite')
+            ->toArray();
+ 
+        $secteurLabels = array_keys($parSecteur);
+        $secteurValues = array_values($parSecteur);
+ 
+        // ── KPIs ──────────────────────────────────────────────────
+        $totalEntreprises = $gerant->entreprises()->count();
+        $validees  = $parStatut['valide'] ?? 0;
+        $rejetees  = $parStatut['rejete'] ?? 0;
+        $soumises  = $parStatut['soumis'] ?? 0;
+        $tauxValid = $counts['total'] > 0
+            ? round(($validees / $counts['total']) * 100, 1)
+            : 0;
+ 
+        return view('dashboard', compact(
+            'declarations', 'counts',
+            'statutLabels', 'statutValues',
+            'moisLabels',   'moisValues',
+            'secteurLabels', 'secteurValues',
+            'totalEntreprises',
+            'validees', 'rejetees', 'soumises', 'tauxValid'
+        ));
     }
 
     public function index(Request $request)
@@ -134,9 +213,25 @@ class DeclarationController extends Controller
             'effectifs' => $request->effectifs,
         ]);
 
+        // ── Log historique interne ────────────────────────────────
+
         HistoriqueService::enregistrer($declaration, 'creation', $request,'Déclaration créée par le gérant.', null);
 
-        return redirect()->route('declarations.index')->with('success', 'Déclaration créée');
+        // ── Log audit spatie ──────────────────────────────────────
+        $message = 'Déclaration créée par le gérant.';
+
+        activity('declarations')
+            ->causedBy(Auth::user())
+            ->performedOn($declaration)
+            ->withProperties([
+                'reference'        => $declaration->reference,
+                'entreprise'       => $entreprise->nom,
+                'nature_activite'  => $declaration->nature_activite,
+                'secteur_activite' => $declaration->secteur_activite,
+                'effectifs'        => $declaration->effectifs,
+            ])->log($message);
+        
+        return redirect()->route('documents.index', $declaration)->with('success', 'Déclaration enregistrée comme brouillon. Ajoutez maintenant les documents requis.');
     }
 
     /**
@@ -145,6 +240,7 @@ class DeclarationController extends Controller
     public function show(Declaration $declaration)
     {
         $this->authorizeAccess($declaration);
+
         $entreprises = Auth::user()->gerant->entreprises;
         $declaration->load('documents');
 
@@ -157,6 +253,7 @@ class DeclarationController extends Controller
     public function edit(Declaration $declaration)
     {
         $this->authorizeAccess($declaration);
+
         $entreprises = Auth::user()->gerant->entreprises;
 
         return view('declarations.edit', compact('declaration', 'entreprises'));
@@ -178,6 +275,14 @@ class DeclarationController extends Controller
         ]);
 
         $ancienStatut = $declaration->statut;
+        
+        // Sauvegarder les anciennes valeurs AVANT modification
+        $anciennesValeurs = $declaration->only([
+            'nature_activite',
+            'secteur_activite',
+            'produits',
+            'effectifs'
+        ]);
 
         $declaration->update([
             'entreprise_id'    => $request->entreprise_id,
@@ -187,7 +292,19 @@ class DeclarationController extends Controller
             'effectifs'        => $request->effectifs,
         ]);
 
+        // ── Log historique interne ────────────────────────────────
         HistoriqueService::enregistrer($declaration, 'modification', $request, 'Informations modifiées par le gérant.', $ancienStatut);
+
+        // ── Log audit spatie ──────────────────────────────────────
+        activity('declarations')
+            ->causedBy(Auth::user())
+            ->performedOn($declaration)
+            ->withProperties([
+                'avant'  => $anciennesValeurs,
+                'apres'  => $declaration->only([
+                    'nature_activite', 'secteur_activite', 'produits', 'effectifs'
+                ]),
+            ])->log('declaration modifiée');
 
         return redirect()->route('declarations.index')->with('success', 'Déclaration mise à jour');
     }
@@ -198,6 +315,16 @@ class DeclarationController extends Controller
     public function destroy(Declaration $declaration)
     {
         $this->authorizeAccess($declaration);
+
+        // ── Log audit spatie AVANT suppression ────────────────────
+        activity('declarations')
+            ->causedBy(Auth::user())
+            ->performedOn($declaration)
+            ->withProperties([
+                'reference'  => $declaration->reference,
+                'statut'     => $declaration->statut,
+                'entreprise' => $declaration->entreprise->nom ?? '—',
+            ])->log('declaration supprimée');
 
         $declaration->delete();
 
@@ -225,10 +352,18 @@ class DeclarationController extends Controller
         $manquants = array_diff($typesObligatoires, $typesPresents);
 
         if (!empty($manquants)) {
-
             $liste = collect($manquants)->map(function ($type) {
                 return $type . ' (non ajouté)';
             })->implode(', ');
+
+            // ── Log tentative échouée ─────────────────────────────
+            activity('declarations')
+                ->causedBy(Auth::user())
+                ->performedOn($declaration)
+                ->withProperties([
+                    'reference'          => $declaration->reference,
+                    'documents_manquants' => array_values($manquants),
+                ])->log('tentative soumission échouée — documents manquants');
 
             return back()->with('error', 'Impossible de soumettre. Documents manquants : ' . $liste
             );
@@ -244,8 +379,20 @@ class DeclarationController extends Controller
             'phase' => 2,
         ]);
 
+        // ── Log historique interne ────────────────────────────────
         HistoriqueService::enregistrer($declaration, 'soumis', request(), 'Déclaration soumise par le gérant.', $ancienStatut);
         NotificationService::notifier($declaration, 'soumis');
+
+        // ── Log audit spatie ──────────────────────────────────────
+        activity('declarations')
+            ->causedBy(Auth::user())
+            ->performedOn($declaration)
+            ->withProperties([
+                'reference'     => $declaration->reference,
+                'ancien_statut' => $ancienStatut,
+                'nouveau_statut' => 'soumis',
+                'submitted_at'  => $declaration->submitted_at,
+            ])->log('declaration soumise');
 
         return back()->with('success', 'Declaration Soumise avec succès.');
     }

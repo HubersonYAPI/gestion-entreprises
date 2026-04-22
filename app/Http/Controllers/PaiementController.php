@@ -32,9 +32,19 @@ class PaiementController extends Controller
 
         //Vérifier expiration
         if ($declaration->date_limite_paiement && Carbon::now()->greaterThan($declaration->date_limite_paiement)) {
+            
             $declaration->update([
-                'statut' => 'expiré'
+                'statut' => 'rejete'
             ]);
+
+            // ── Log expiration ────────────────────────────────────
+            activity('paiements')
+                ->causedBy(Auth::user())
+                ->performedOn($declaration)
+                ->withProperties([
+                    'reference'            => $declaration->reference,
+                    'date_limite_paiement' => $declaration->date_limite_paiement->toDateTimeString(),
+                ])->log('paiement expiré — délai dépassé');
 
             return redirect()->route('declarations.index')->with('error', 'Delai de paiement expiré');
         }
@@ -44,10 +54,8 @@ class PaiementController extends Controller
             return back()->with('error', 'Paiement déjà effectué');
         }
 
-        $ancienStatut = $declaration->statut;
-
         //Créer paiement
-        Paiement::create([
+        $paiement = Paiement::create([
             'declaration_id' => $declaration->id,
             'montant' => 10000,
             'reference' => 'PAY-' . strtoupper(Str::random(8)),
@@ -60,13 +68,26 @@ class PaiementController extends Controller
         $ancienStatut = $declaration->statut;
 
         $declaration->update([
-            'statut' => 'en_traitement',
+            'statut' => 'paye',
             'phase' => 4,
             'paid_at' =>Carbon::now(),
         ]);
 
         HistoriqueService::enregistrer($declaration, 'paye', request(), 'Paiement effectué par le gérant.', $ancienStatut);
         NotificationService::notifier($declaration, 'paye');
+
+        // ── Log audit ─────────────────────────────────────────────
+        activity('paiements')
+            ->causedBy(Auth::user())
+            ->performedOn($declaration)
+            ->withProperties([
+                'declaration_ref' => $declaration->reference,
+                'paiement_ref'    => $paiement->reference,
+                'montant'         => $paiement->montant,
+                'ancien_statut'   => $ancienStatut,
+                'nouveau_statut'  => 'paye',
+                'paid_at'         => $declaration->paid_at->toDateTimeString(),
+            ])->log('paiement effectué');
 
         return redirect()->route('declarations.index')->with('success', 'Paiement effectué avec succès');
     }

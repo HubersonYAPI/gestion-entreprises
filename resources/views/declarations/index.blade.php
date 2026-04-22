@@ -74,6 +74,8 @@
                     <tr>
                         <th>Référence</th>
                         <th>Entreprise</th>
+                        <th>Nature d'activité</th>
+                        <th>Secteur</th>
                         <th>Statut</th>
                         <th>Phase</th>
                         <th>Date</th>
@@ -97,6 +99,8 @@
                     <tr>
                         <td class="utbl-mono">{{ $declaration->reference }}</td>
                         <td class="utbl-nm">{{ $declaration->entreprise->nom ?? '—' }}</td>
+                        <td style="font-size:.74rem;color:var(--t3);white-space:nowrap;">{{ $declaration->nature_activite ?? '—' }}</td>
+                        <td style="font-size:.74rem;color:var(--t3);white-space:nowrap;">{{ $declaration->secteur_activite ?? '—' }}</td>
                         <td><span class="ubadge {{ $sc }}">{{ $sl }}</span></td>
                         <td>
                             <span style="font-size:.7rem;font-weight:600;padding:2px 7px;border-radius:6px;background:#f1f5f9;color:var(--t2);border:1px solid var(--border);">

@@ -105,12 +105,12 @@
                         <td class="ref">{{ $declaration->reference ?? '—' }}</td>
                         <td class="nm">{{ $entreprise->nom ?? '—' }}</td>
                         <td>
-                            <span class="ph">{{ $entreprise->type ?? '—' }}</span>
+                            <span class="ph">{{ $entreprise->type_entreprise ?? '—' }}</span>
                         </td>
                         <td class="mt">{{ $declaration->secteur_activite ?? '—' }}</td>
                         <td style="font-size:.8rem;color:var(--t2);">
                             @if($gerant)
-                                {{ $gerant->prenom }} {{ $gerant->nom }}
+                                {{ $gerant->prenoms }} {{ $gerant->nom }}
                             @else
                                 —
                             @endif

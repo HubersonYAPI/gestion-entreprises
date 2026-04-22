@@ -75,7 +75,7 @@ class DeclarationFactory extends Factory
             'phase'                => 3,
             'submitted_at'         => now()->subDays(rand(6, 12)),
             'validated_at'         => now()->subDays(rand(2, 5)),
-            'date_limite_paiement' => now()->addHours(rand(12, 72)),
+            'date_limite_paiement' => now()->addHours(rand(12, 48)),
         ]);
     }
 

@@ -73,8 +73,8 @@
                 <div class="uactions">
                     <a href="{{ route('declarations.index') }}" class="ubtn ubtn-secondary">Annuler</a>
                     <button type="submit" class="ubtn ubtn-primary">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                        Créer la déclaration
+                        Etape suivante
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                     </button>
                 </div>
             </form>

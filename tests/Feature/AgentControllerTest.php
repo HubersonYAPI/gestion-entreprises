@@ -157,7 +157,7 @@ describe('AgentController@valider', function () {
             ->post(route('agent.valider', $declaration))
             ->assertRedirect(route('agent.dashboard'));
 
-        expect($declaration->fresh()->statut)->toBe('en_attente_paiement');
+        expect($declaration->fresh()->statut)->toBe('approuve');
         expect($declaration->fresh()->phase)->toBe(3);
         expect($declaration->fresh()->date_limite_paiement)->not->toBeNull();
     });

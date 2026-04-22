@@ -710,5 +710,7 @@
     </div>
 </div>
 
+{{-- Scripts empilés (TRÈS IMPORTANT) --}}
+    @stack('scripts')
 </body>
 </html>

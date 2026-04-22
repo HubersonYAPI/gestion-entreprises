@@ -290,7 +290,7 @@
                 </div>
 
                 {{-- Entreprises --}}
-                <div>
+                {{-- <div>
                     <button @click="tm('e')"
                         class="sb-link {{ request()->routeIs('entreprises.*') || request()->routeIs('gerant.*') ? 'act':'' }}"
                         :class="{'op': menu==='e'}">
@@ -313,6 +313,22 @@
                             Gérant
                         </a>
                     </div>
+                </div> --}}
+
+                <div>
+                    <a href="{{ route('entreprises.index') }}"
+                           class="sb-link {{ request()->routeIs('entreprises.*') ? 'act':'' }}">
+                            <svg class="sb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="7" width="20" height="14" rx="2"/>
+                            <path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/>
+                        </svg>
+                            Entreprise
+                        </a>
+                        <a href="{{ route('gerant.show') }}"
+                           class="sb-link {{ request()->routeIs('gerant.show') || request()->routeIs('gerant.edit') ? 'act':'' }}">
+                            <svg style="width:11px;height:11px;opacity:.5;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/></svg>
+                            Gérant
+                        </a>
                 </div>
 
                 {{-- Attestations --}}
@@ -332,10 +348,10 @@
 
         </nav>
 
-        {{-- Profil (footer sidebar) --}}
+        {{-- Profil (footer sidebar) --}} 
         <div class="sb-ft">
-            <a href="{{ route('gerant.show') }}"
-               class="sb-link {{ request()->routeIs('gerant.*') ? 'act':'' }}">
+            <a href="{{ route('profile.edit') }}"
+               class="sb-link {{ request()->routeIs('profile.*') ? 'act':'' }}">
                 <svg class="sb-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
                     <circle cx="12" cy="7" r="4"/>
@@ -424,5 +440,8 @@
 
     </div>
 </div>
+
+{{-- Scripts empilés (TRÈS IMPORTANT) --}}
+    @stack('scripts')
 </body>
 </html>

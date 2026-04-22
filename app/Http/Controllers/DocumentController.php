@@ -43,10 +43,20 @@ class DocumentController extends Controller
         $filePath = $request->file('file')->store('documents', 'public');
 
         // Enregistrement
-        $declaration->documents()->create([
+        $document = $declaration->documents()->create([
             'type' => $request->type,
             'file_path' => $filePath,
         ]);
+
+        // ── Log audit ─────────────────────────────────────────────
+        activity('documents')
+            ->causedBy(Auth::user())
+            ->performedOn($document)
+            ->withProperties([
+                'type'            => $document->type,
+                'file_path'       => $filePath,
+                'declaration_ref' => $declaration->reference,
+            ])->log('document ajouté');
 
         return back()->with('success', 'Document Ajouté avec succès');
     }
@@ -59,6 +69,17 @@ class DocumentController extends Controller
         if ($document->declaration->entreprise->gerant_id !== $user->gerant->id) {
             abort(403);
         }
+
+        // ── Log audit AVANT suppression ───────────────────────────
+        activity('documents')
+            ->causedBy(Auth::user())
+            ->performedOn($document)
+            ->withProperties([
+                'type'            => $document->type,
+                'file_path'       => $document->file_path,
+                'statut'          => $document->statut,
+                'declaration_ref' => $document->declaration->reference ?? '—',
+            ])->log('document supprimé');
 
         // Supprimer le fichier du storage
         if ($document->file_path && Storage::disk('public')->exists($document->file_path)) {
