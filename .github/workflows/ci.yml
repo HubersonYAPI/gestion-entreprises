@@ -1,0 +1,131 @@
+# ==============================================================================
+# .github/workflows/ci.yml
+# Pipeline CI/CD — Laravel + Pest (testsuite Feature)
+# Placez ce fichier dans : .github/workflows/ci.yml
+# ==============================================================================
+
+name: "Tests & Déploiement"
+
+# ── Déclencheurs ───────────────────────────────────────────────────────────────
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+
+  # ============================================================================
+  # JOB 1 : Tests Pest (Feature)
+  # ============================================================================
+  tests:
+    name: "Pest — Feature Suite"
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: "Checkout du code"
+        uses: actions/checkout@v4
+
+      - name: "Setup PHP 8.3"
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: mbstring, pdo, pdo_sqlite, sqlite3, xml, dom, bcmath, fileinfo, gd
+          coverage: none
+
+      - name: "Cache Composer"
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
+
+      - name: "Installer les dépendances PHP"
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: "Cache npm"
+        uses: actions/cache@v4
+        with:
+          path: node_modules
+          key: npm-${{ hashFiles('package-lock.json') }}
+          restore-keys: npm-
+
+      - name: "Installer et compiler les assets"
+        run: |
+          npm ci --silent
+          npm run build
+
+      - name: "Préparer l'environnement de test"
+        run: |
+          cp .env.example .env.testing
+          echo "" >> .env.testing
+          echo "APP_ENV=testing"         >> .env.testing
+          echo "DB_CONNECTION=sqlite"    >> .env.testing
+          echo "DB_DATABASE=:memory:"   >> .env.testing
+          echo "CACHE_DRIVER=array"      >> .env.testing
+          echo "SESSION_DRIVER=array"    >> .env.testing
+          echo "QUEUE_CONNECTION=sync"   >> .env.testing
+          echo "MAIL_MAILER=array"       >> .env.testing
+          echo "FILESYSTEM_DISK=local"   >> .env.testing
+          php artisan key:generate --env=testing
+
+      - name: "Lancer les migrations"
+        env:
+          APP_ENV: testing
+          DB_CONNECTION: sqlite
+          DB_DATABASE: ":memory:"
+        run: php artisan migrate --force --env=testing
+
+      - name: "Exécuter Pest --testsuite=Feature"
+        env:
+          APP_ENV: testing
+          DB_CONNECTION: sqlite
+          DB_DATABASE: ":memory:"
+          CACHE_DRIVER: array
+          SESSION_DRIVER: array
+          QUEUE_CONNECTION: sync
+          MAIL_MAILER: array
+          FILESYSTEM_DISK: local
+        run: vendor/bin/pest --testsuite=Feature --colors=always
+
+  # ============================================================================
+  # JOB 2 : Déploiement (seulement si tests OK + branche main)
+  # ============================================================================
+  deploy:
+    name: "Déploiement en production"
+    runs-on: ubuntu-latest
+    needs: tests
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+
+      - name: "Checkout du code"
+        uses: actions/checkout@v4
+
+      # ── Option A : Déploiement via SSH ─────────────────────────────────────
+      # Ajoutez dans Settings > Secrets : SSH_PRIVATE_KEY, SSH_HOST, SSH_USER, SSH_PATH
+      #
+      # - name: "Déployer via SSH"
+      #   uses: appleboy/ssh-action@v1
+      #   with:
+      #     host:     ${{ secrets.SSH_HOST }}
+      #     username: ${{ secrets.SSH_USER }}
+      #     key:      ${{ secrets.SSH_PRIVATE_KEY }}
+      #     script: |
+      #       cd ${{ secrets.SSH_PATH }}
+      #       git pull origin main
+      #       composer install --no-dev --optimize-autoloader
+      #       php artisan migrate --force
+      #       php artisan config:cache
+      #       php artisan route:cache
+      #       php artisan view:cache
+
+      # ── Option B : Déploiement Render / Railway (webhook) ─────────────────
+      # Ajoutez dans Settings > Secrets : DEPLOY_WEBHOOK_URL
+      #
+      # - name: "Déclencher le déploiement"
+      #   run: curl -X POST "${{ secrets.DEPLOY_WEBHOOK_URL }}"
+
+      - name: "Déploiement non configuré"
+        run: echo "Activez l'Option A ou B ci-dessus pour déployer automatiquement."

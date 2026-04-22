@@ -73,6 +73,8 @@ php artisan route:cache
 php artisan view:cache
 php artisan event:cache 2>/dev/null || true
 
+php artisan queue:work
+
 # ── 7. Permissions ────────────────────────────────────────────
 echo "[7/9] Permissions..."
 chown -R www-data:www-data \
