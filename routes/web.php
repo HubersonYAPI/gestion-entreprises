@@ -13,6 +13,8 @@ use App\Http\Controllers\AttestationController;
 use App\Http\Controllers\StatistiqueController;
 use App\Http\Controllers\RapportController;
 use App\Http\Controllers\AuditLogController;
+use App\Http\Controllers\UtilisateurController;
+use App\Http\Controllers\RoleController;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Declaration;
 use App\Models\Gerant;
@@ -110,10 +112,20 @@ Route::prefix('agent')
     Route::get('/analyses/rapports',     [RapportController::class,     'index'])->name('analyses.rapports');
 
 
-    // ── Administration ─────────────────────────────────────────
-    Route::get('/admin/utilisateurs', [AgentController::class, 'dashboard'])->name('admin.utilisateurs');
-    Route::get('/admin/roles',        [AgentController::class, 'dashboard'])->name('admin.roles');
+    // ── Log ─────────────────────────────────────────
     Route::get('/admin/logs',         [AuditLogController::class, 'index'])->name('admin.logs');
+
+    // ── Utilisateurs ───────────────────────────────────────────────────────────
+    Route::get('/admin/utilisateurs',                   [UtilisateurController::class, 'index'])->name('admin.utilisateurs');
+    Route::patch('/admin/utilisateurs/{user}/role',     [UtilisateurController::class, 'updateRole'])->name('admin.utilisateurs.role');
+    Route::patch('/admin/utilisateurs/{user}/toggle',   [UtilisateurController::class, 'toggleActive'])->name('admin.utilisateurs.toggle');
+    Route::delete('/admin/utilisateurs/{user}',         [UtilisateurController::class, 'destroy'])->name('admin.utilisateurs.destroy');
+
+    // ── Rôles & Permissions ────────────────────────────────────────────────────
+    Route::get('/admin/roles',                          [RoleController::class, 'index'])->name('admin.roles');
+    Route::post('/admin/roles',                         [RoleController::class, 'store'])->name('admin.roles.store');
+    Route::patch('/admin/roles/{role}/permissions',     [RoleController::class, 'updatePermissions'])->name('admin.roles.permissions');
+    Route::delete('/admin/roles/{role}',                [RoleController::class, 'destroy'])->name('admin.roles.destroy');
 
     // Traitement + finaliser  declaration
     Route::post('/declarations/{declaration}/traiter',   [TraitementController::class, 'traiter'])->name('traiter');
