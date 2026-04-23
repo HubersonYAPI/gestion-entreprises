@@ -66,6 +66,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/{id}/read',      [NotificationController::class, 'markAsRead'])->name('markAsRead');
         Route::delete('/{id}',        [NotificationController::class, 'destroy'])->name('destroy');
     });
+
+    Route::get('/notifications/poll', [NotificationController::class, 'poll'])
+    ->name('notifications.poll');
 });
 
 

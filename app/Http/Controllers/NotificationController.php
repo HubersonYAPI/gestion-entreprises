@@ -8,35 +8,48 @@ use Illuminate\Support\Facades\Auth;
 class NotificationController extends Controller
 {
     /**
+     * Endpoint de polling — retourne count + 5 dernières non-lues en JSON
+     * Appelé toutes les 30s par notification-bell.blade.php via fetch()
+     */
+    public function poll()
+    {
+        $user   = Auth::user();
+        $unread = $user->unreadNotifications->take(5);
+
+        $items = $unread->map(fn($n) => [
+            'id'                    => $n->id,
+            'action_label'          => $n->data['action_label']          ?? 'Notification',
+            'declaration_reference' => $n->data['declaration_reference'] ?? '',
+            'entreprise_nom'        => $n->data['entreprise_nom']        ?? '',
+            'commentaire'           => $n->data['commentaire']           ?? '',
+            'couleur'               => $n->data['couleur']               ?? 'gray',
+            'read_url'              => route('notifications.markAsRead', $n->id),
+            'created_at_human'      => $n->created_at->diffForHumans(),
+        ]);
+
+        return response()->json([
+            'count' => $user->unreadNotifications->count(),
+            'items' => $items->values(),
+        ]);
+    }
+
+    /**
      * Marquer une notification comme lue et rediriger
      */
     public function markAsRead(string $id)
     {
-        $notification = Auth::user()
-            ->notifications()
-            ->findOrFail($id);
-
+        $notification = Auth::user()->notifications()->findOrFail($id);
         $notification->markAsRead();
 
-        // L'URL stockée en base est une URL absolue générée au moment de l'envoi
-        // (ex: http://localhost:8000/agent/declarations/11).
-        // On extrait uniquement le PATH pour éviter les problèmes de port/domaine
-        // entre le moment où la notif a été créée et celui où on clique dessus.
         $storedUrl = $notification->data['url'] ?? null;
 
         if ($storedUrl) {
-            $path = parse_url($storedUrl, PHP_URL_PATH);
-
-            // Récupérer aussi le query string s'il existe
+            $path  = parse_url($storedUrl, PHP_URL_PATH);
             $query = parse_url($storedUrl, PHP_URL_QUERY);
-            $redirectPath = $path . ($query ? '?' . $query : '');
-
-            return redirect($redirectPath);
+            return redirect($path . ($query ? '?' . $query : ''));
         }
 
-        // Fallback : dashboard selon le rôle
-        $user = Auth::user();
-        $fallback = $user->hasAnyRole(['AGENT', 'CONTROLEUR', 'SUPER_ADMIN'])
+        $fallback = Auth::user()->hasAnyRole(['AGENT', 'CONTROLEUR', 'SUPER_ADMIN'])
             ? route('agent.dashboard')
             : route('dashboard');
 
@@ -44,38 +57,29 @@ class NotificationController extends Controller
     }
 
     /**
-     * Marquer TOUTES les notifications comme lues
+     * Marquer TOUTES comme lues
      */
     public function markAllAsRead()
     {
         Auth::user()->unreadNotifications->markAsRead();
-
         return back()->with('success', 'Toutes les notifications ont été lues.');
     }
 
     /**
-     * Liste de toutes les notifications (page dédiée)
+     * Page liste complète
      */
     public function index()
     {
-        $notifications = Auth::user()
-            ->notifications()
-            ->latest()
-            ->paginate(10);
-
+        $notifications = Auth::user()->notifications()->latest()->paginate(20);
         return view('notifications.index', compact('notifications'));
     }
 
     /**
-     * Supprimer une notification
+     * Supprimer
      */
     public function destroy(string $id)
     {
-        Auth::user()
-            ->notifications()
-            ->findOrFail($id)
-            ->delete();
-
+        Auth::user()->notifications()->findOrFail($id)->delete();
         return back()->with('success', 'Notification supprimée.');
     }
 }
