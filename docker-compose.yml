@@ -17,7 +17,7 @@ services:
     ports:
       - "10000:10000"       # Accès : http://localhost:10000
     environment:
-      APP_NAME: Ges_Decl
+      APP_NAME: PDAI
       APP_ENV: production
       APP_KEY: base64:Dh9rc4qBimBoRct+u/Euu5oMq/SFjeTD9WPYHe61okU=
       APP_DEBUG: "false"

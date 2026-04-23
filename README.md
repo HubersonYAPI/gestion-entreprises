@@ -1,62 +1,148 @@
+# 🇨🇮 PDAI — Plateforme de Déclaration d’Activité Industrielle
+
 ![Tests](https://github.com/HubersonYAPI/gestion-entreprises/actions/workflows/ci.yml/badge.svg)
 
+## 📌 À propos
 
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+**PDAI** est une plateforme web permettant aux entreprises de réaliser leurs **déclarations d’activité industrielle 100 % en ligne** en Côte d’Ivoire.
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Elle simplifie un processus administratif souvent complexe en offrant une expérience **rapide, sécurisée et entièrement dématérialisée**.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🚀 Fonctionnalités principales
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+* 📝 **Dépôt numérique des déclarations**
+  Soumission complète des dossiers sans déplacement
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+* 📊 **Suivi en temps réel**
+  Statuts clairs : Brouillon → Soumise → Paiement → Validée
 
-## Learning Laravel
+* 🔐 **Sécurité & traçabilité**
+  Journalisation (audit trail) de toutes les actions
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+* 📄 **Attestation officielle PDF**
+  Génération et téléchargement après validation
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+* 🔔 **Notifications**
+  Alertes utilisateur (polling ou temps réel)
 
-## Laravel Sponsors
+* 🧑‍💼 **Espace administrateur**
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+  * Gestion des utilisateurs
+  * Rôles & permissions
+  * Statistiques & rapports
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## 🧭 Processus de déclaration
 
-## Contributing
+La plateforme suit un cycle simple en **4 phases** :
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+1. **Création du dossier**
 
-## Code of Conduct
+   * Informations du gérant
+   * Informations de l’entreprise
+   * Upload des documents
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+2. **Soumission**
 
-## Security Vulnerabilities
+   * Vérification
+   * Envoi du dossier
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+3. **Paiement**
 
-## License
+   * Validation par un agent
+   * Paiement des droits
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+4. **Validation**
+
+   * Génération de l’attestation officielle
+
+---
+
+## 📂 Documents requis
+
+### Obligatoires
+
+* Informations du gérant
+* Informations de l’entreprise
+* Pièce d’identité
+
+### Optionnels
+
+* RCCM
+* Numéro fiscal (NIF)
+
+### Phase paiement
+
+* Justificatif de paiement
+
+---
+
+## ⚙️ Stack technique
+
+* **Backend** : Laravel
+* **Frontend** : Blade + Tailwind CSS
+* **Base de données** : MySQL
+* **Temps réel** : Laravel Echo / Soketi (optionnel)
+* **Déploiement** : Render
+
+---
+
+## 🖥️ Installation
+
+```bash
+git clone https://github.com/HubersonYAPI/gestion-entreprises.git
+cd gestion-entreprises
+
+composer install
+cp .env.example .env
+php artisan key:generate
+
+# Configurer la base de données dans .env
+
+php artisan migrate --seed
+npm install && npm run build
+
+php artisan serve
+```
+
+---
+
+## 🔐 Accès
+
+* Utilisateur : inscription via l’interface
+* Admin : défini via seed ou base de données
+
+---
+
+## 📸 Aperçu
+
+* Landing page moderne
+* Dashboard utilisateur
+* Gestion des déclarations
+* Interface admin complète
+
+---
+
+## 📞 Support
+
+* Email : **[pdai@commerce.gouv.ci](mailto:pdai@commerce.gouv.ci)**
+* Téléphone : **+225 20 00 00 00**
+
+Disponibilité : **Lundi – Vendredi, 07h30 – 16h30**
+
+---
+
+## 📄 Licence
+
+Projet sous licence **MIT**
+
+---
+
+## ✨ Vision
+
+Faire de **PDAI** une référence en matière de **digitalisation des démarches administratives industrielles en Côte d’Ivoire**.
+
+---

@@ -7,7 +7,7 @@
 set -e
 
 echo "========================================"
-echo " Démarrage Ges_Decl — $(date)"
+echo " Démarrage PDAI — $(date)"
 echo "========================================"
 
 # ── 1. Lien symbolique storage ───────────────────────────────

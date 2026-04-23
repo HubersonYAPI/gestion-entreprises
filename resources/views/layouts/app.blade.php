@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'Ges_Decl') }}</title>
+    <title>{{ config('app.name', 'PDAI') }}</title>
 
     <link rel="icon" href="{{ asset('images/logo_favicon.jpg') }}" type="image/jpg" sizes="32x32">
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -208,7 +208,7 @@
                     <path d="M9 22V12h6v10"/>
                 </svg>
             </div>
-            <span class="sb-app">{{ config('app.name','Ges_Decl') }}</span>
+            <span class="sb-app">{{ config('app.name','PDAI') }}</span>
             {{-- Badge rôle --}}
             @auth
                 @if(Auth::user()->hasRole('AGENT') || Auth::user()->hasRole('CONTROLEUR') || Auth::user()->hasRole('SUPER_ADMIN'))

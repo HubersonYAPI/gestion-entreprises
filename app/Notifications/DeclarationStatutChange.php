@@ -110,17 +110,17 @@ class DeclarationStatutChange extends Notification implements ShouldQueue
         $ref = $this->declaration->reference;
  
         $subjects = [
-            'soumis'           => "[Ges_Decl] Nouvelle déclaration soumise — {$ref}",
-            'approuve'         => "[Ges_Decl] ✅ Déclaration approuvée — {$ref}",
-            'rejete'           => "[Ges_Decl] ❌ Déclaration rejetée — {$ref}",
-            'en_traitement'    => "[Ges_Decl] ⏳ Déclaration en traitement — {$ref}",
-            'paye'             => "[Ges_Decl] 💳 Paiement reçu — {$ref}",
-            'valide'           => "[Ges_Decl] ✅ Déclaration validée — {$ref}",
-            'document_valide'  => "[Ges_Decl] Document validé — {$ref}",
-            'document_rejete'  => "[Ges_Decl] Document rejeté — {$ref}",
+            'soumis'           => "[PDAI] Nouvelle déclaration soumise — {$ref}",
+            'approuve'         => "[PDAI] ✅ Déclaration approuvée — {$ref}",
+            'rejete'           => "[PDAI] ❌ Déclaration rejetée — {$ref}",
+            'en_traitement'    => "[PDAI] ⏳ Déclaration en traitement — {$ref}",
+            'paye'             => "[PDAI] 💳 Paiement reçu — {$ref}",
+            'valide'           => "[PDAI] ✅ Déclaration validée — {$ref}",
+            'document_valide'  => "[PDAI] Document validé — {$ref}",
+            'document_rejete'  => "[PDAI] Document rejeté — {$ref}",
         ];
  
-        return $subjects[$this->action] ?? "[Ges_Decl] Mise à jour — {$ref}";
+        return $subjects[$this->action] ?? "[PDAI] Mise à jour — {$ref}";
     }
 
     private function getEmailLine(): string

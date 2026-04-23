@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'DAI') }} — Admin</title>
+    <title>{{ config('app.name', 'PDAI') }} — Admin</title>
 
     <link rel="icon" href="{{ asset('images/logo_favicon.jpg') }}" type="image/jpg" sizes="32x32">
 
