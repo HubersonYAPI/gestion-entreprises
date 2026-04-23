@@ -3,7 +3,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ config('app.name', 'Ges_Decl') }} — Gestion des Déclarations</title>
+    <title>{{ config('app.name', 'Ges_Decl') }} — Déclaration d'Activité Industrielle</title>
+
+    <link rel="icon" href="{{ asset('images/logo_favicon.jpg') }}" type="image/jpg" sizes="32x32">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
@@ -39,7 +41,7 @@
         nav {
             position: fixed; top: 0; left: 0; right: 0; z-index: 100;
             display: flex; align-items: center; justify-content: space-between;
-            padding: 0 5%; height: 68px;
+            padding: 0 5%; height: 80px;
             background: rgba(255,255,255,0.95);
             backdrop-filter: blur(16px);
             border-bottom: 1px solid var(--border);
@@ -327,7 +329,7 @@
 {{-- ═══ NAVIGATION ═══ --}}
 <nav>
     <a href="/" style="display:flex; align-items:center; gap:10px; text-decoration:none;">
-        <img src="{{ asset('images/logo.png') }}" alt="Logo" style="height:40px;">
+        <img src="{{ asset('images/logo.png') }}" alt="Logo" style="height:60px;">
     </a>
     <div class="nav-links">
         <a href="#documents">Documents</a>
@@ -355,7 +357,7 @@
             <div class="hero-badge"><span></span> Plateforme officielle</div>
             <h1>Gérez vos <em>déclarations</em><br>en toute simplicité</h1>
             <p class="hero-desc">
-                Créez, soumettez et suivez l'état de vos déclarations d'entreprise en quelques clics.
+                Créez, soumettez et suivez l'état de vos Déclarations d'Activité Industrielle en quelques clics.
                 Un processus clair, rapide et 100&nbsp;% en ligne.
             </p>
             <div class="hero-actions">
@@ -673,7 +675,7 @@
         </div>
     </div>
     <div class="footer-bottom">
-        © {{ date('Y') }} — Plateforme de gestion des déclarations d'entreprise. Tous droits réservés.
+        © {{ date('Y') }} — Plateforme de gestion des Déclarations d'Activité Industrielle. Tous droits réservés.
     </div>
 </footer>
 

@@ -1,0 +1,264 @@
+/* ============================================================
+   auth.css — Styles partagés pour les pages login & register
+   Ges_Decl · Côte d'Ivoire
+   ============================================================ */
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --orange:    #F47920;
+    --orange-dk: #D4610A;
+    --orange-lt: #FFF6EE;
+    --green:     #2E9E5B;
+    --green-lt:  #EAF7EF;
+    --black:     #1A1A1A;
+    --gray-dk:   #4B5563;
+    --gray:      #6B7280;
+    --border:    #E5E7EB;
+    --white:     #FFFFFF;
+}
+
+/* ---------- Page ---------- */
+html, body {
+    height: 100%;
+    font-family: 'Inter', sans-serif;
+    background: var(--orange-lt);
+    color: var(--black);
+}
+
+body::before {
+    content: '';
+    display: block;
+    height: 4px;
+    background: linear-gradient(
+        90deg,
+        var(--orange) 33.33%,
+        var(--white)  33.33% 66.66%,
+        var(--green)  66.66%
+    );
+}
+
+.page-wrapper {
+    min-height: calc(100vh - 4px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 16px;
+}
+
+/* ---------- Brand ---------- */
+.brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 28px;
+    text-decoration: none;
+}
+
+.brand img {
+    height: 72px;
+    width: auto;
+    margin-bottom: 10px;
+}
+
+.brand-name {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: .8rem;
+    color: var(--gray);
+    letter-spacing: .06em;
+    text-transform: uppercase;
+}
+
+/* ---------- Card ---------- */
+.auth-card {
+    background: var(--white);
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(26, 26, 26, .10), 0 0 0 1px #EDE8E3;
+    padding: 40px 36px;
+    width: 100%;
+    max-width: 440px;
+}
+
+.auth-card h1 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--black);
+    margin-bottom: 6px;
+}
+
+.auth-card .subtitle {
+    font-size: .875rem;
+    color: var(--gray);
+    margin-bottom: 28px;
+}
+
+/* ---------- Session status ---------- */
+.session-status {
+    background: var(--green-lt);
+    border: 1px solid #C8EDD8;
+    color: var(--green);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: .85rem;
+    margin-bottom: 20px;
+}
+
+/* ---------- Form ---------- */
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.form-group label {
+    display: block;
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--gray-dk);
+    margin-bottom: 6px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="password"] {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: .9rem;
+    color: var(--black);
+    background: var(--white);
+    transition: border-color .2s, box-shadow .2s;
+    outline: none;
+}
+
+.form-group input:focus {
+    border-color: var(--orange);
+    box-shadow: 0 0 0 3px rgba(244, 121, 32, .12);
+}
+
+.form-group input.is-invalid {
+    border-color: #EF4444;
+}
+
+.input-error {
+    font-size: .78rem;
+    color: #EF4444;
+    margin-top: 5px;
+}
+
+.password-hint {
+    font-size: .75rem;
+    color: var(--gray);
+    margin-top: 5px;
+}
+
+/* ---------- Remember / Forgot ---------- */
+.form-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.remember-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .82rem;
+    color: var(--gray-dk);
+    cursor: pointer;
+}
+
+.remember-label input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    accent-color: var(--orange);
+    cursor: pointer;
+}
+
+.link-subtle {
+    font-size: .82rem;
+    color: var(--gray);
+    text-decoration: none;
+    transition: color .2s;
+}
+
+.link-subtle:hover {
+    color: var(--orange);
+}
+
+/* ---------- Submit button ---------- */
+.btn-submit {
+    width: 100%;
+    padding: 13px;
+    background: var(--orange);
+    color: var(--white);
+    border: none;
+    border-radius: 10px;
+    font-family: 'Poppins', sans-serif;
+    font-size: .9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .2s;
+    letter-spacing: .02em;
+    margin-top: 8px;
+}
+
+.btn-submit:hover {
+    background: var(--orange-dk);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(244, 121, 32, .35);
+}
+
+/* ---------- Divider & links ---------- */
+.divider {
+    text-align: center;
+    margin: 20px 0;
+    font-size: .78rem;
+    color: var(--gray);
+    position: relative;
+}
+
+.divider::before,
+.divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 42%;
+    height: 1px;
+    background: var(--border);
+}
+
+.divider::before { left: 0; }
+.divider::after  { right: 0; }
+
+.alt-link {
+    text-align: center;
+    font-size: .82rem;
+    color: var(--gray);
+}
+
+.alt-link a {
+    color: var(--orange);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.alt-link a:hover {
+    text-decoration: underline;
+}
